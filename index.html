@@ -415,6 +415,7 @@ function deriveHole(h){
           toPar: score!=null? score-h.par : null};
 }
 function deriveRound(r){
+  if(r.legacy) return deriveLegacyRound(r);
   const holes = r.holes||[];
   let sc=0,par=0,putts=0,pen=0,played=0, firY=0,firN=0, girY=0,girN=0, tp=0, udA=0,udM=0, sA=0,sM=0, f9=0,b9=0;
   const perHole=[];
@@ -431,6 +432,22 @@ function deriveRound(r){
   });
   return {perHole, played, score:sc, par, toPar:sc-par, putts, pen, f9, b9,
           firY, firD:firY+firN, girY, girD:girY+girN, tp, udA, udM, sA, sM};
+}
+
+/* ---------------- legacy (imported) rounds ----------------
+   Imported from 18Birdies: hole strokes + round aggregates only.
+   No per-shot data, no hole pars, no rating/slope. */
+function deriveLegacyRound(r){
+  const a = r.agg||{};
+  const hs = (r.holes||[]).map(h=>h.strokes||0);
+  const f9 = hs.slice(0,9).reduce((s,x)=>s+x,0);
+  const b9 = hs.slice(9).reduce((s,x)=>s+x,0);
+  return {legacy:true, perHole:hs.map(s=>({score:s})), played:hs.length,
+    score:a.strokes||f9+b9, par:(a.strokes||0)-(a.toPar||0), toPar:a.toPar||0,
+    putts:a.putts||0, pen:0, f9, b9,
+    firY:a.firY||0, firD:a.firD||0, girY:a.girY||0, girD:a.girD||0,
+    tp:0, udA:0, udM:0, sA:0, sM:0,
+    eagles:a.eagles||0, birdies:a.birdies||0, pars:a.pars||0, bogeys:a.bogeys||0, dblOrWorse:a.dblOrWorse||0};
 }
 
 /* ============================================================
@@ -555,11 +572,11 @@ function vRoundsHome(){
     <div style="height:14px"></div>
     <div class="card"><div class="hd"><span class="t">Recent rounds</span></div><div class="bd tight">`;
   if(!past.length) html += `<div style="padding:16px 14px" class="muted">No rounds yet. Start one above — everything works offline.</div>`;
-  else html += past.slice(0,15).map(r=>{
+  else html += past.slice(0,100).map(r=>{
       const d=deriveRound(r); const c=courseOf(r);
       return `<div class="listRow" onclick="VIEWROUND='${r.id}';PLAYVIEW='roundDetail';render()">
-        <div class="main"><div class="ti">${esc(c?c.name:'Course')}</div>
-        <div class="sub">${fmtDate(r.date)} · ${d.putts} putts · GIR ${pct(d.girY,d.girD)}</div></div>
+        <div class="main"><div class="ti">${esc(c?c.name:'Course')}${r.legacy?' <span class="tag" style="background:var(--sand);color:var(--amber)">18B</span>':''}</div>
+        <div class="sub">${fmtDate(r.date)} · ${d.played} holes · ${d.putts} putts · GIR ${pct(d.girY,d.girD)}</div></div>
         <div class="num" style="font-size:22px;font-weight:800">${d.score}<span class="muted" style="font-size:13px"> ${d.toPar===0?'E':(d.toPar>0?'+':'')+d.toPar}</span></div>
         <span class="arr">›</span></div>`;
     }).join('');
@@ -588,12 +605,14 @@ function startRoundSheet(){
 }
 function srTees(){
   const c=S.courses.find(c=>c.id===$('#srCourse').value);
-  $('#srTee').innerHTML = (c.tees||[]).map(t=>`<option value="${t.id}">${esc(t.name)} · ${t.rating||'?'} / ${t.slope||'?'}</option>`).join('');
+  const ts=(c.tees||[]);
+  $('#srTee').innerHTML = ts.length? ts.map(t=>`<option value="${t.id}">${esc(t.name)} · ${t.rating||'?'} / ${t.slope||'?'}</option>`).join('')
+    : `<option value="">No tee data yet — pick to set up</option>`;
 }
 function startRound(){
   const c=S.courses.find(c=>c.id===$('#srCourse').value);
   const t=(c.tees||[]).find(t=>t.id===$('#srTee').value);
-  if(!t) return;
+  if(!t){ toast('Add tee details for this course first.'); courseEditor(c.id, true); return; }
   const r={id:uid(), courseId:c.id, teeId:t.id, date:$('#srDate').value||todayISO(),
     weather:$('#srWx').value.trim(), notes:'', finished:false, curHole:1,
     holes:t.holes.map(h=>({n:h.n,par:h.par,ydg:h.ydg,si:h.si,windD:'',windS:0,shots:[],pen:0,ov:{}}))};
@@ -953,6 +972,7 @@ function finishRound(){
 }
 function vRoundDetail(id){
   const r=S.rounds.find(x=>x.id===id); if(!r){PLAYVIEW='home';return vRoundsHome();}
+  if(r.legacy) return vLegacyDetail(r);
   const rd=deriveRound(r);
   handicapTimeline();
   const holes=r.holes.map((h,i)=>{
@@ -977,6 +997,29 @@ function vRoundDetail(id){
 }
 function reopenHole(rid,n){ const r=S.rounds.find(x=>x.id===rid); r.finished=false; S.activeRoundId=rid; r.curHole=n; PLAYVIEW='hole'; render(); }
 function reopenRound(rid){ const r=S.rounds.find(x=>x.id===rid); r.finished=false; S.activeRoundId=rid; PLAYVIEW='hole'; render(); }
+
+function vLegacyDetail(r){
+  const rd=deriveRound(r);
+  const c=courseOf(r);
+  const cells=r.holes.map((h,i)=>`<div class="ovCell"><div class="hn">${h.n}</div><div class="sc">${h.strokes||'–'}</div></div>`).join('');
+  return `<div class="row" style="justify-content:space-between;margin-bottom:10px">
+    <button class="btn sm ghost" onclick="PLAYVIEW='home';render()">‹ Rounds</button>
+    <span class="tag" style="background:var(--sand);color:var(--amber)">Imported from 18Birdies</span></div>
+  <div class="pageTitle"><h1>${esc(c?c.name:'Round')}</h1>
+    <span class="num" style="font-size:24px;font-weight:800">${rd.score}</span></div>
+  <div class="small muted" style="margin:-8px 2px 12px">${fmtDate(r.date)} · ${rd.toPar===0?'E':(rd.toPar>0?'+':'')+rd.toPar} · ${rd.played} holes</div>
+  <div class="card"><div class="hd"><span class="t">Hole strokes</span></div><div class="bd"><div class="ovGrid">${cells}</div></div></div>
+  <div class="card"><div class="hd"><span class="t">Round stats</span></div><div class="bd">
+    <div class="grid4 center">
+      ${bignum(rd.putts||'–','putts')}
+      ${bignum(pct(rd.firY,rd.firD),'FIR')}
+      ${bignum(pct(rd.girY,rd.girD),'GIR')}
+      ${bignum((rd.birdies||0)+'','birdies')}
+    </div>
+    <div class="small muted" style="margin-top:8px">Summary-level import: hole strokes and round totals only. No shot detail, so this round feeds scoring, putts, FIR and GIR averages, but not heatmaps, first-putt stats, yardages or handicap.</div>
+  </div></div>
+  <button class="btn wide danger sm" onclick="if(confirm('Delete this imported round?')){S.rounds=S.rounds.filter(x=>x.id!=='${r.id}');PLAYVIEW='home';render();}">Delete round</button>`;
+}
 /* ============================================================
    STATS TAB
    ============================================================ */
@@ -1007,18 +1050,23 @@ function vStats(){
   const scores=rds.map(d=>d.score);
   const toPars=rds.map(d=>d.toPar);
 
-  // scoring by par
+  const shotRs = rs.filter(r=>!r.legacy);             // rounds with full shot detail
+  const nShot = shotRs.length, nLegacy = n-nShot;
+  // scoring by par (shot-tracked only: legacy holes carry no par)
   const byPar={3:[],4:[],5:[]};
-  rs.forEach(r=>r.holes.forEach(h=>{const d=deriveHole(h); if(d.score!=null&&byPar[h.par]) byPar[h.par].push(d.score);}));
-  // score distribution
-  const dist={eagle:0,birdie:0,par:0,bogey:0,dbl:0,other:0};
-  rs.forEach(r=>r.holes.forEach(h=>{const d=deriveHole(h); if(d.score==null)return; const t=d.score-h.par;
-    if(t<=-2)dist.eagle++; else if(t===-1)dist.birdie++; else if(t===0)dist.par++; else if(t===1)dist.bogey++; else if(t===2)dist.dbl++; else dist.other++;}));
-  // aggregates
-  const agg=rds.reduce((a,d)=>{a.firY+=d.firY;a.firD+=d.firD;a.girY+=d.girY;a.girD+=d.girD;a.tp+=d.tp;a.udA+=d.udA;a.udM+=d.udM;a.sA+=d.sA;a.sM+=d.sM;a.pen+=d.pen;a.putts+=d.putts;a.holes+=d.played;return a;},{firY:0,firD:0,girY:0,girD:0,tp:0,udA:0,udM:0,sA:0,sM:0,pen:0,putts:0,holes:0});
-  // putts per GIR
+  shotRs.forEach(r=>r.holes.forEach(h=>{const d=deriveHole(h); if(d.score!=null&&byPar[h.par]) byPar[h.par].push(d.score);}));
+  // score distribution — Dbl+ bucket so 18Birdies aggregates merge cleanly
+  const dist={eagle:0,birdie:0,par:0,bogey:0,dbl:0};
+  shotRs.forEach(r=>r.holes.forEach(h=>{const d=deriveHole(h); if(d.score==null)return; const t=d.score-h.par;
+    if(t<=-2)dist.eagle++; else if(t===-1)dist.birdie++; else if(t===0)dist.par++; else if(t===1)dist.bogey++; else dist.dbl++;}));
+  rds.filter(d=>d.legacy).forEach(d=>{dist.eagle+=d.eagles;dist.birdie+=d.birdies;dist.par+=d.pars;dist.bogey+=d.bogeys;dist.dbl+=d.dblOrWorse;});
+  // aggregates: FIR/GIR/putts blend legacy; scrambling/3-putt need shot detail
+  const agg=rds.reduce((a,d)=>{a.firY+=d.firY;a.firD+=d.firD;a.girY+=d.girY;a.girD+=d.girD;a.pen+=d.pen;a.putts+=d.putts;
+    if(!d.legacy){a.tp+=d.tp;a.udA+=d.udA;a.udM+=d.udM;a.sA+=d.sA;a.sM+=d.sM;a.holes+=d.played;} return a;},
+    {firY:0,firD:0,girY:0,girD:0,tp:0,udA:0,udM:0,sA:0,sM:0,pen:0,putts:0,holes:0});
+  // putts per GIR + first-putt detail (shot-tracked only)
   let pGIR=[],fp=[];
-  rs.forEach(r=>r.holes.forEach(h=>{const d=deriveHole(h);
+  shotRs.forEach(r=>r.holes.forEach(h=>{const d=deriveHole(h);
     if(d.gir==='Y') pGIR.push(d.putts);
     if(d.firstPuttFt!=null) fp.push({ft:d.firstPuttFt, made:d.firstPuttMade, putts:d.putts});}));
   // first-putt buckets
@@ -1032,7 +1080,7 @@ function vStats(){
       <td class="num">${pct(g.filter(x=>x.putts>=3).length,g.length)}</td></tr>`;
   }).join('');
 
-  return `<div class="pageTitle"><h1>Stats</h1><span class="eyebrow">${n} round${n>1?'s':''}</span></div>
+  return `<div class="pageTitle"><h1>Stats</h1><span class="eyebrow">${n} round${n>1?'s':''}${nLegacy?` · ${nLegacy} imported`:''}</span></div>
 
   <div class="card"><div class="hd"><span class="t">Handicap</span>
       <span class="num" style="font-size:20px;font-weight:800">${idx!=null? r1(idx):'–'}</span></div>
@@ -1060,7 +1108,7 @@ function vStats(){
     <div class="row small" style="flex-wrap:wrap;gap:10px">
       <span class="stat">Eag <b>${dist.eagle}</b></span><span class="stat good">Bird <b>${dist.birdie}</b></span>
       <span class="stat">Par <b>${dist.par}</b></span><span class="stat">Bog <b>${dist.bogey}</b></span>
-      <span class="stat">Dbl <b>${dist.dbl}</b></span><span class="stat bad">Other <b>${dist.other}</b></span></div>
+      <span class="stat bad">Dbl+ <b>${dist.dbl}</b></span></div>
   </div></div>
 
   <div class="card"><div class="hd"><span class="t">Tee to green</span></div><div class="bd">
@@ -1078,7 +1126,7 @@ function vStats(){
       ${bignum(r1(mean(pGIR)),'putts/GIR')}
       ${bignum(pct(agg.tp,agg.holes),'3-putt')}
     </div><hr class="sep">
-    <div class="small" style="font-weight:800;margin-bottom:4px">First-putt distance</div>
+    <div class="small" style="font-weight:800;margin-bottom:4px">First-putt distance${nLegacy?' <span class="muted" style="font-weight:600">(shot-tracked rounds only)</span>':''}</div>
     <table class="data"><tr><th class="num">Dist</th><th class="num">n</th><th class="num">Make</th><th class="num">Avg putts</th><th class="num">3-putt</th></tr>${bRows}</table>
   </div></div>
 
@@ -1418,6 +1466,11 @@ function vData(){
     <div style="height:8px"></div>
     <p class="small muted">AI text: the compact per-hole block format, ready to paste into a chat for analysis.</p>
     <button class="btn wide" onclick="exportAllText()">Copy all rounds as AI text</button>
+  </div></div>
+  <div class="card"><div class="hd"><span class="t">Import from 18Birdies</span></div><div class="bd">
+    <p class="small muted">Request your data export from 18Birdies (Settings → Account → Request My Data), then pick the JSON file here. Courses and round history come in as summary rounds: hole strokes, putts, FIR and GIR. Re-importing a newer export is safe — rounds already imported are skipped, so you can top up your history any time.</p>
+    <button class="btn primary wide" onclick="$('#imp18b').click()">Import 18Birdies JSON</button>
+    <input type="file" id="imp18b" accept=".json,application/json,.txt" style="display:none" onchange="import18B(this)">
   </div></div>`;
 }
 function download(name, text, mime){
@@ -1444,6 +1497,13 @@ function exportCSV(){
   const rows=[head];
   finishedRounds().forEach(r=>{
     const cn=courseOf(r)? courseOf(r).name:'';
+    if(r.legacy){
+      r.holes.forEach(h=>{
+        rows.push([r.date,cn,h.n,'','','SUMMARY','','','','','','','','','','','18Birdies import',
+          h.strokes||'', '', '', '', '', '', '', ''].map(csvEsc).join(','));
+      });
+      return;
+    }
     r.holes.forEach(h=>{
       (h.shots||[]).forEach((s,i)=>{
         const fin = s.fType==='lat'? (s.lat||'') : s.pad? s.pad+(s.fType==='putt'?'p':'g'):'';
@@ -1479,7 +1539,7 @@ function exportRoundText(id){
   copyText(roundText(r), 'Round copied — paste anywhere.');
 }
 function exportAllText(){
-  copyText(finishedRounds().map(roundText).join('\n\n'), 'All rounds copied.');
+  copyText(finishedRounds().filter(r=>!r.legacy).map(roundText).join('\n\n'), 'All shot-tracked rounds copied.');
 }
 function copyText(txt,msg){
   const done=()=>toast(msg||'Copied.');
@@ -1489,6 +1549,65 @@ function copyText(txt,msg){
 function fallbackCopy(txt,done){
   const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
   ta.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta); done();
+}
+
+/* ============================================================
+   18BIRDIES IMPORT — merge, never replace; idempotent by source id
+   ============================================================ */
+function import18B(inp){
+  const f=inp.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ try{ const res=convert18B(JSON.parse(rd.result));
+      toast(`Imported ${res.rounds} rounds and ${res.courses} new courses.` + (res.skipped? ` Skipped ${res.skipped} already imported.`:''));
+      MOREVIEW='menu'; TAB='play'; PLAYVIEW='home'; render();
+    }catch(e){ toast('Could not read that as an 18Birdies export.'); }
+    inp.value=''; };
+  rd.readAsText(f);
+}
+function convert18B(json){
+  const md = json.myData||json;
+  const act = (md.activityData&&md.activityData.rounds)||[];
+  const clubs = ((md.clubData&&md.clubData.playedClubs)||[]);
+  const nameById = {}; clubs.forEach(c=>{ nameById[c.clubId]=c.name; });
+  // course per 18Birdies club: reuse by name, else create a stub (tees added later by hand)
+  const courseIdByName = {};
+  S.courses.forEach(c=>{ courseIdByName[c.name.toLowerCase()]=c.id; });
+  let newCourses=0;
+  function courseFor(name){
+    if(!name) name='Imported course';
+    const key=name.toLowerCase();
+    if(!courseIdByName[key]){
+      const c={id:uid(), name, tees:[]};
+      S.courses.push(c); courseIdByName[key]=c.id; newCourses++;
+    }
+    return courseIdByName[key];
+  }
+  const have=new Set(S.rounds.map(r=>r.srcId).filter(Boolean));
+  let added=0, skipped=0;
+  for(const r of act){
+    if(!r || !Array.isArray(r.holeStrokes) || !r.holeStrokes.length) continue;
+    if(have.has(r.id)){ skipped++; continue; }
+    const st=r.stats||{};
+    const d=new Date(r.timestamp||Date.now());
+    const date=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    S.rounds.push({
+      id:uid(), legacy:true, source:'18birdies', srcId:r.id, finished:true,
+      courseId: courseFor(nameById[(r.clubId&&r.clubId.id)||''] ), teeId:null, date,
+      holes: r.holeStrokes.map((s,i)=>({n:i+1, strokes:s})),
+      agg:{
+        strokes:r.strokes, toPar:(typeof r.score==='number'? r.score : null),
+        putts:st.putts||0,
+        firY:st.fairwayMiddles||0, firD:st.fairwayHoleCount||0,
+        girY:st.gir||0, girD:st.girHoleCount||0,
+        eagles:(st.eagles||0)+(st.doubleEagleOrBetter||0)+(st.aces||0),
+        birdies:st.birdies||0, pars:st.pars||0, bogeys:st.bogeys||0,
+        dblOrWorse:st.doubleBogeyOrWorse||0
+      }
+    });
+    have.add(r.id); added++;
+  }
+  save();
+  return {rounds:added, courses:newCourses, skipped};
 }
 
 /* ============================================================
