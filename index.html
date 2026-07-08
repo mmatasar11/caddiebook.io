@@ -12,41 +12,48 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23185C37'/%3E%3Ccircle cx='90' cy='90' r='34' fill='%23FBFAF6'/%3E%3Ccircle cx='90' cy='90' r='9' fill='%23D22E2E'/%3E%3C/svg%3E">
 <style>
 :root{
-  --paper:#FBFAF6; --card:#FFFFFF; --ink:#14171A; --ink2:#5A6169; --line:#D9D6CC;
-  --turf:#185C37; --turf-soft:#E7F0EA; --flag:#D22E2E; --flag-soft:#FBE9E7;
-  --sand:#F1E9D6; --amber:#B07D10;
-  --r:10px; --tap:52px;
+  --paper:#F4F5F2; --card:#FFFFFF; --ink:#171B1E; --ink2:#61686E; --line:#E3E5E1;
+  --turf:#1B6B41; --turf-deep:#0F4A2C; --turf-soft:#E4F1E9; --flag:#D93A2B; --flag-soft:#FCEAE7;
+  --sand:#F3ECD9; --amber:#A8770E; --sky:#EAF2F8;
+  --r:16px; --rs:11px; --tap:52px;
+  --sh:0 1px 2px rgba(23,27,30,.06),0 4px 14px rgba(23,27,30,.06);
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
   --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{font-family:var(--ui);background:var(--paper);color:var(--ink);font-size:16px;
-  padding-bottom:calc(76px + env(safe-area-inset-bottom));user-select:none;-webkit-user-select:none}
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:calc(80px + env(safe-area-inset-bottom));user-select:none;-webkit-user-select:none}
 input,textarea{user-select:text;-webkit-user-select:text}
 button{font-family:var(--ui);color:var(--ink)}
+a{color:var(--turf);font-weight:700;text-decoration:none}
 .num{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
 
 /* ---------- shell ---------- */
-#view{max-width:560px;margin:0 auto;padding:10px 12px 24px}
-#nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:2px solid var(--ink);
-  display:flex;z-index:40;padding-bottom:env(safe-area-inset-bottom)}
-#nav button{flex:1;background:none;border:0;padding:10px 0 8px;font-size:11px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
-#nav button .ic{display:block;font-size:20px;line-height:1.15}
-#nav button.on{color:var(--turf)}
-#nav button.on .ic{transform:translateY(-1px)}
+#view{max-width:560px;margin:0 auto;padding:14px 14px 24px}
+#nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);display:flex;z-index:40;padding-bottom:env(safe-area-inset-bottom)}
+#nav button{flex:1;background:none;border:0;padding:9px 0 7px;font-size:10.5px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
+#nav button .ic{display:block;font-size:21px;line-height:1.2;filter:grayscale(1);opacity:.55}
+#nav button.on{color:var(--turf-deep)}
+#nav button.on .ic{filter:none;opacity:1}
 
-.pageTitle{display:flex;align-items:baseline;justify-content:space-between;margin:6px 2px 12px}
-.pageTitle h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em}
-.eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--turf)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 12px;min-height:40px}
+.pageTitle{display:flex;align-items:baseline;justify-content:space-between;margin:4px 2px 14px}
+.pageTitle h1{margin:0;font-size:27px;font-weight:800;letter-spacing:-.03em}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--turf)}
 
-.card{background:var(--card);border:2px solid var(--ink);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
-.card>.hd{padding:10px 14px;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;align-items:center;gap:8px;
-  background-image:radial-gradient(var(--line) 1.1px,transparent 1.1px);background-size:11px 11px}
-.card>.hd .t{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;background:var(--card);padding:0 4px}
-.card>.bd{padding:12px 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px;overflow:hidden;box-shadow:var(--sh)}
+.card>.hd{padding:11px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card>.hd .t{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+.card>.bd{padding:13px 16px}
 .card>.bd.tight{padding:0}
+.card.hero{background:linear-gradient(140deg,var(--turf-deep),var(--turf) 70%,#2E8253);color:#fff;border:0}
+.card.hero .k{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.card.hero .muted{color:rgba(255,255,255,.75)}
 
 .row{display:flex;gap:8px;align-items:center}
 .grow{flex:1}
@@ -54,168 +61,200 @@ button{font-family:var(--ui);color:var(--ink)}
 .small{font-size:13px}
 .right{text-align:right}
 .center{text-align:center}
-hr.sep{border:0;border-top:1px solid var(--line);margin:10px 0}
+hr.sep{border:0;border-top:1px solid var(--line);margin:11px 0}
 
 /* ---------- buttons & chips ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--tap);
-  padding:0 18px;border:2px solid var(--ink);border-radius:var(--r);background:var(--card);
+  padding:0 18px;border:1.5px solid var(--ink);border-radius:14px;background:var(--card);
   font-size:16px;font-weight:700;cursor:pointer}
-.btn.primary{background:var(--turf);border-color:var(--turf);color:#fff}
-.btn.danger{background:var(--flag-soft);border-color:var(--flag);color:var(--flag)}
-.btn.ghost{border-color:var(--line);color:var(--ink2)}
+.btn.primary{background:var(--turf-deep);border-color:var(--turf-deep);color:#fff;box-shadow:0 6px 16px rgba(15,74,44,.28)}
+.btn.danger{background:var(--flag-soft);border-color:transparent;color:var(--flag)}
+.btn.ghost{border-color:var(--line);color:var(--ink2);background:transparent}
 .btn.wide{width:100%}
-.btn.sm{min-height:38px;padding:0 12px;font-size:14px;border-width:1.5px}
-.btn:active{transform:scale(.98)}
+.btn.sm{min-height:38px;padding:0 12px;font-size:14px;border-width:1px;border-radius:11px}
+.btn:active{transform:scale(.97)}
 
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{min-height:44px;padding:0 13px;display:inline-flex;align-items:center;justify-content:center;
-  border:2px solid var(--line);border-radius:999px;background:var(--card);font-weight:700;font-size:15px;cursor:pointer}
-.chip.on{border-color:var(--turf);background:var(--turf);color:#fff}
-.chip.hint{border-color:var(--amber);box-shadow:0 0 0 2px var(--sand) inset}
-.chip.sm{min-height:34px;font-size:13px;padding:0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{min-height:44px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;
+  border:1.5px solid var(--line);border-radius:999px;background:var(--card);font-weight:700;font-size:15px;cursor:pointer}
+.chip.on{border-color:var(--turf-deep);background:var(--turf-deep);color:#fff}
+.chip.hint{border-color:var(--amber);background:var(--sand)}
+.chip.sm{min-height:34px;font-size:13px;padding:0 11px}
+.seg{display:flex;background:var(--paper);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;font-weight:700;font-size:14px;color:var(--ink2)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 
-label.f{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:10px 0 5px}
-input.f,textarea.f,select.f{width:100%;min-height:48px;padding:8px 12px;font-size:17px;border:2px solid var(--ink);
-  border-radius:var(--r);background:var(--card);color:var(--ink);font-family:var(--ui)}
+label.f{display:block;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:11px 0 5px}
+input.f,textarea.f,select.f{width:100%;min-height:48px;padding:8px 13px;font-size:17px;border:1.5px solid var(--line);
+  border-radius:var(--rs);background:var(--card);color:var(--ink);font-family:var(--ui)}
+input.f:focus,textarea.f:focus{outline:none;border-color:var(--turf)}
 input.f.num{font-family:var(--mono);font-weight:700}
 textarea.f{min-height:80px}
 
-/* ---------- signature: the numpad ---------- */
+/* ---------- signature numpad ---------- */
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:340px}
-.pad button{position:relative;aspect-ratio:1.35/1;min-height:56px;border:2px solid var(--ink);border-radius:var(--r);
+.pad button{position:relative;aspect-ratio:1.35/1;min-height:56px;border:1.5px solid var(--line);border-radius:13px;
   background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px}
 .pad button .d{font-family:var(--mono);font-weight:800;font-size:20px;line-height:1}
 .pad button .l{font-size:9.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink2);margin-top:3px}
 .pad button.pure{border-color:var(--flag)}
-.pad button.pure::after{content:"";position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--flag)}
-.pad button.on{background:var(--turf);border-color:var(--turf);color:#fff}
-.pad button.on .l{color:#DCEEE3}
+.pad button.pure::after{content:"";position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--flag)}
+.pad button.on{background:var(--turf-deep);border-color:var(--turf-deep);color:#fff}
+.pad button.on .l{color:#CFE6D8}
 .pad button.on.pure{background:var(--flag);border-color:var(--flag)}
 .pad .axis{grid-column:1/-1;display:flex;justify-content:space-between;font-size:10px;font-weight:800;
   letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);padding:0 2px}
-
-/* heatmap variant */
 .pad.heat button{cursor:default;min-height:62px}
 .pad.heat button .pct{font-family:var(--mono);font-weight:800;font-size:17px}
 .pad.heat button .n{font-size:10px;color:var(--ink2);font-family:var(--mono)}
 
-/* ---------- shot list ---------- */
-.shotRow{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+/* ---------- shots ---------- */
+.shotRow{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer}
 .shotRow:last-child{border-bottom:0}
-.shotRow .sn{font-family:var(--mono);font-weight:800;color:var(--ink2);width:22px}
+.shotRow .sn{font-family:var(--mono);font-weight:800;color:var(--ink2);width:20px}
 .shotRow .club{font-weight:800;width:44px}
-.shotRow .lie{font-family:var(--mono);font-weight:700;font-size:13px;background:var(--turf-soft);color:var(--turf);
-  border-radius:6px;padding:2px 6px}
+.shotRow .lie{font-family:var(--mono);font-weight:700;font-size:12.5px;background:var(--turf-soft);color:var(--turf-deep);border-radius:7px;padding:3px 7px}
 .shotRow .fin{font-family:var(--mono);font-weight:700;font-size:14px}
 .penRow{background:var(--flag-soft)}
 .penRow .lie{background:#fff;color:var(--flag)}
 
 /* ---------- hole header ---------- */
 .holeHd{display:flex;align-items:stretch;gap:10px;margin-bottom:12px}
-.holeNo{border:2px solid var(--ink);border-radius:var(--r);background:var(--ink);color:#fff;
-  min-width:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px}
+.holeNo{border-radius:var(--r);background:var(--turf-deep);color:#fff;min-width:76px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px;box-shadow:var(--sh)}
 .holeNo .h{font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;opacity:.7}
 .holeNo .n{font-family:var(--mono);font-weight:800;font-size:34px;line-height:1}
-.holeMeta{flex:1;border:2px solid var(--ink);border-radius:var(--r);background:var(--card);
-  display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center}
+.holeMeta{flex:1;border:1px solid var(--line);border-radius:var(--r);background:var(--card);
+  display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;box-shadow:var(--sh)}
 .holeMeta div{text-align:center;padding:6px 2px}
 .holeMeta .k{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
 .holeMeta .v{font-family:var(--mono);font-weight:800;font-size:22px}
 
 .statChips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-.stat{border:1.5px solid var(--line);border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;background:var(--card)}
+.stat{border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-size:12.5px;font-weight:700;background:var(--card)}
 .stat b{font-family:var(--mono)}
-.stat.good{border-color:var(--turf);color:var(--turf)}
-.stat.bad{border-color:var(--flag);color:var(--flag)}
+.stat.good{border-color:var(--turf);color:var(--turf-deep);background:var(--turf-soft)}
+.stat.bad{border-color:transparent;color:var(--flag);background:var(--flag-soft)}
 
 /* ---------- overview grid ---------- */
 .ovGrid{display:grid;grid-template-columns:repeat(9,1fr);gap:4px}
-.ovCell{border:1.5px solid var(--line);border-radius:8px;padding:4px 2px;text-align:center;cursor:pointer;background:var(--card)}
+.ovCell{border:1px solid var(--line);border-radius:9px;padding:4px 2px;text-align:center;cursor:pointer;background:var(--card)}
 .ovCell .hn{font-size:9px;font-weight:800;color:var(--ink2)}
 .ovCell .sc{font-family:var(--mono);font-weight:800;font-size:16px}
-.ovCell .dots{font-size:8px;letter-spacing:1px}
-.ovCell.under{background:var(--turf);border-color:var(--turf);color:#fff}
+.ovCell .dots{font-size:8px;letter-spacing:1px;min-height:10px}
+.ovCell.under{background:var(--turf-deep);border-color:var(--turf-deep);color:#fff}
 .ovCell.under .hn{color:#CFE6D8}
-.ovCell.over1{background:var(--sand)}
-.ovCell.overX{background:var(--flag-soft);border-color:var(--flag)}
+.ovCell.over1{background:var(--sand);border-color:transparent}
+.ovCell.overX{background:var(--flag-soft);border-color:transparent}
 
-/* ---------- sheet / modal ---------- */
-#sheetWrap{position:fixed;inset:0;background:rgba(20,23,26,.45);z-index:60;display:none;align-items:flex-end;justify-content:center}
+/* ---------- sheet ---------- */
+#sheetWrap{position:fixed;inset:0;background:rgba(15,20,17,.5);z-index:60;display:none;align-items:flex-end;justify-content:center}
 #sheetWrap.open{display:flex}
-#sheet{background:var(--paper);border-top:3px solid var(--ink);border-radius:18px 18px 0 0;width:100%;max-width:560px;
-  max-height:92vh;overflow-y:auto;padding:14px 14px calc(20px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+#sheet{background:var(--paper);border-radius:22px 22px 0 0;width:100%;max-width:560px;
+  max-height:90vh;overflow-y:auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+#sheet::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
 #sheet .sheetHd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-#sheet .sheetHd .t{font-size:17px;font-weight:800}
-.sec{margin:14px 0 4px;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--turf)}
+#sheet .sheetHd .t{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.sec{margin:15px 0 5px;font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--turf)}
 
-/* keypad */
 .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:300px}
-.keypad button{min-height:52px;border:2px solid var(--ink);border-radius:var(--r);background:var(--card);
+.keypad button{min-height:52px;border:1.5px solid var(--line);border-radius:13px;background:var(--card);
   font-family:var(--mono);font-weight:800;font-size:22px;cursor:pointer}
+.keypad button:active{background:var(--turf-soft)}
 .distShow{font-family:var(--mono);font-weight:800;font-size:34px;min-width:110px;text-align:right;
   border-bottom:3px solid var(--ink);padding:0 6px 2px;line-height:1.1}
 .distShow .u{font-size:15px;color:var(--ink2);font-weight:700}
 
-/* course entry grid */
+/* course grid */
 .crsGrid{width:100%;border-collapse:collapse}
 .crsGrid th{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);padding:4px 2px;text-align:center}
 .crsGrid td{padding:3px 2px;text-align:center;border-top:1px solid var(--line)}
 .crsGrid .hn{font-family:var(--mono);font-weight:800;color:var(--ink2)}
 .parBtns{display:flex;gap:3px;justify-content:center}
-.parBtns button{width:34px;height:38px;border:1.5px solid var(--line);border-radius:7px;background:var(--card);
+.parBtns button{width:34px;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--card);
   font-family:var(--mono);font-weight:800;font-size:15px}
-.parBtns button.on{background:var(--turf);border-color:var(--turf);color:#fff}
-.crsGrid input{width:56px;min-height:38px;text-align:center;border:1.5px solid var(--line);border-radius:7px;
+.parBtns button.on{background:var(--turf-deep);border-color:var(--turf-deep);color:#fff}
+.crsGrid input{width:56px;min-height:38px;text-align:center;border:1px solid var(--line);border-radius:8px;
   font-family:var(--mono);font-weight:700;font-size:15px;padding:2px}
 .crsGrid input.si{width:42px}
 
-/* tables */
 table.data{width:100%;border-collapse:collapse;font-size:14px}
 table.data th{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);
-  text-align:left;padding:7px 8px;border-bottom:2px solid var(--ink)}
-table.data td{padding:7px 8px;border-bottom:1px solid var(--line)}
+  text-align:left;padding:8px 9px;border-bottom:1.5px solid var(--ink)}
+table.data td{padding:8px 9px;border-bottom:1px solid var(--line)}
 table.data td.num,table.data th.num{text-align:right;font-family:var(--mono)}
 table.data tr:last-child td{border-bottom:0}
 
-/* tips */
-.tipCard{border:2px solid var(--ink);border-radius:var(--r);background:var(--card);padding:12px 14px;margin-bottom:10px}
+/* tips & drills */
+.tipCard{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:13px 15px;margin-bottom:10px;box-shadow:var(--sh)}
 .tipCard .tt{font-weight:800;font-size:16px;display:flex;justify-content:space-between;gap:8px}
 .tipCard .tb{margin-top:6px;white-space:pre-wrap;font-size:15px;line-height:1.45}
+.tipCard img{max-width:100%;border-radius:10px;margin-top:8px}
 .tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
-  background:var(--turf-soft);color:var(--turf);border-radius:6px;padding:3px 7px;margin:6px 6px 0 0}
+  background:var(--turf-soft);color:var(--turf-deep);border-radius:7px;padding:3px 8px;margin:6px 6px 0 0}
 .pinBadge{color:var(--amber);font-size:14px}
+details.drill{border:1px solid var(--line);border-radius:var(--rs);background:var(--card);margin-bottom:8px;overflow:hidden}
+details.drill summary{list-style:none;cursor:pointer;padding:13px 15px;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:8px}
+details.drill summary::-webkit-details-marker{display:none}
+details.drill summary::after{content:"▾";color:var(--ink2)}
+details.drill[open] summary::after{content:"▴"}
+details.drill .db{padding:0 15px 13px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;color:var(--ink)}
 
-.banner{border:2px solid var(--amber);background:var(--sand);border-radius:var(--r);padding:9px 12px;
+.banner{border:0;background:var(--sand);border-radius:var(--rs);padding:10px 13px;
   font-size:14px;font-weight:600;margin-bottom:12px;display:flex;gap:8px;align-items:center;cursor:pointer}
-
 .spark{display:block}
 .spark polyline{fill:none;stroke:var(--turf);stroke-width:2.5}
 .spark circle{fill:var(--flag)}
 
-.listRow{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.listRow{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer}
 .listRow:last-child{border-bottom:0}
 .listRow .main{flex:1}
 .listRow .ti{font-weight:800;font-size:16px}
 .listRow .sub{font-size:13px;color:var(--ink2);margin-top:2px}
 .listRow .arr{color:var(--ink2);font-size:18px}
 
-.quip{border-left:4px solid var(--turf);padding:8px 12px;margin:0 0 12px;font-size:16px;font-style:italic;line-height:1.4}
-.quip .by{display:block;font-style:normal;font-size:12px;font-weight:700;color:var(--ink2);margin-top:4px}
+.quip{border-left:4px solid var(--turf);padding:8px 13px;margin:0 0 12px;font-size:16px;font-style:italic;line-height:1.4;background:var(--card);border-radius:0 var(--rs) var(--rs) 0}
+.quip .by{display:block;font-style:normal;font-size:12px;font-weight:700;color:var(--ink2);margin-top:5px}
 
-/* ---------- high visibility outdoor theme ---------- */
-body.hivis{--paper:#FFFFFF;--card:#FFFFFF;--ink:#000000;--ink2:#333333;--line:#999999;
-  --turf:#0B4A28;--flag:#C40000;--tap:60px;font-size:17px}
-body.hivis .pad button{min-height:64px;border-width:3px}
-body.hivis .btn{border-width:3px}
-body.hivis .card{border-width:3px}
+.courseChip{min-width:150px;flex:0 0 auto;border:1px solid var(--line);border-radius:var(--r);background:var(--card);
+  padding:12px 14px;cursor:pointer;box-shadow:var(--sh)}
+.courseChip .cn{font-weight:800;font-size:15px;line-height:1.2}
+.courseChip .cs{font-size:12px;color:var(--ink2);margin-top:3px}
+.hscroll{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
 
-@media (max-width:380px){
-  .ovGrid{grid-template-columns:repeat(6,1fr)}
-}
+.insight{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.4}
+.insight:last-child{border-bottom:0}
+.insight .ii{font-size:17px}
+
+/* high visibility */
+body.hivis{--paper:#FFFFFF;--card:#FFFFFF;--ink:#000;--ink2:#333;--line:#8F8F8F;
+  --turf:#0B4A28;--turf-deep:#07351C;--flag:#C40000;--tap:60px;--sh:none;font-size:17px}
+body.hivis .pad button{min-height:64px;border-width:2.5px}
+body.hivis .btn{border-width:2.5px}
+body.hivis .card{border-width:2px}
+@media (max-width:380px){ .ovGrid{grid-template-columns:repeat(6,1fr)} }
+
+/* segmented controls used across play + start sheet */
+.segs{display:flex;background:#E9EBE7;border-radius:12px;padding:3px;gap:3px}
+.segs button{flex:1;min-height:40px;border:0;border-radius:9px;background:transparent;font-weight:700;font-size:14px;color:var(--ink2);cursor:pointer}
+.segs button.on{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
+/* quick-score button grid (Basic mode) */
+.qgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.qgrid button{min-height:56px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);
+  font-family:var(--mono);font-weight:800;font-size:19px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.qgrid button .sub{font-family:var(--ui);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2)}
+.qgrid button.on{background:var(--turf-deep);border-color:var(--turf-deep);color:#fff}
+.qgrid button.on .sub{color:#CFE6D8}
+/* hero number + hole history line */
+.big{font-family:var(--mono);font-weight:800;font-size:44px;line-height:1}
+.histLine{display:flex;gap:8px;align-items:center;background:var(--sky);border-radius:var(--rs);
+  padding:9px 12px;font-size:13.5px;margin-bottom:10px}
+.histLine b{font-family:var(--mono)}
 </style>
 </head>
 <body>
@@ -262,7 +301,7 @@ function defaultBag(){
     ['Dr','D',270],['3w','W',240],['5i','I',190],['6i','I',178],['7i','I',166],
     ['8i','I',154],['9i','I',142],['PW','Wg',130],['52°','Wg',115],['56°','Wg',100],['60°','Wg',82],['Pt','P',0]
   ];
-  return rows.map((r,i)=>({id:uid()+i, label:r[0], type:r[1], stock:r[2], sort:i}));
+  return rows.map((r,i)=>({id:uid()+i, label:r[0], type:r[1], stock:r[2], sort:i, brand:'', model:'', bench:false}));
 }
 function seedTips(){
   return [
@@ -287,6 +326,8 @@ function defaultState(){
       showLabels:true,        // words on numpads vs bare digits
       hiVis:false,            // outdoor high-visibility theme
       greenRelPin:true,       // green pad digit is always relative to pin, GIR separate
+      defaultMode:'advanced',  // 'basic' (score+putts+flags per hole) or 'advanced' (shot-by-shot)
+      gcApiKey:'',             // optional golfcourseapi.com key for online course lookup
       tmCols:['carry','total','bs','cs','sm','la','spin']
     },
     clubs: defaultBag(),
@@ -347,11 +388,12 @@ const TM_METRICS = [
 /* ---------------- club helpers ---------------- */
 function club(id){ return S.clubs.find(c=>c.id===id); }
 function clubLabel(id){ const c=club(id); return c? c.label : '?'; }
-function putterId(){ const c=S.clubs.find(c=>c.type==='P'); return c? c.id : null; }
+function putterId(){ const c=S.clubs.find(c=>c.type==='P'&&!c.bench)||S.clubs.find(c=>c.type==='P'); return c? c.id : null; }
+function activeClubs(){ return [...S.clubs].filter(c=>!c.bench).sort((a,b)=>a.sort-b.sort); }
 function suggestClub(dist){
   if(!dist) return null;
   let best=null, bd=1e9;
-  for(const c of S.clubs){ if(c.type==='P') continue;
+  for(const c of activeClubs()){ if(c.type==='P') continue;
     const d=Math.abs((c.stock||0)-dist); if(d<bd){bd=d;best=c;} }
   return best? best.id : null;
 }
@@ -409,9 +451,11 @@ function deriveHole(h){
   const sandM = sandA && score!=null && score<=h.par;
 
   const fp = firstPuttShot(h);
+  let fpFt = fp? fp.dist : null, fpMade = fp? fp.pad===5 : null;
+  if(fpFt==null && ov.firstPuttFt!=null){ fpFt=ov.firstPuttFt; fpMade = putts>=1? putts===1 : null; }
   return {score, putts, fir, gir, pen, threePutt, udA, udM,
           sand:sandShots, sandA, sandM,
-          firstPuttFt: fp? fp.dist : null, firstPuttMade: fp? fp.pad===5 : null,
+          firstPuttFt: fpFt, firstPuttMade: fpMade,
           toPar: score!=null? score-h.par : null};
 }
 function deriveRound(r){
@@ -478,6 +522,7 @@ function adjustedGross(r, indexBefore){
   return {ags, complete};
 }
 function scoreDifferential(r, indexBefore){
+  if(!is18(r)) return null;                     // 9-hole differentials need 9-hole ratings we don't store
   const tee = teeOf(r);
   if(!tee || !tee.slope || !tee.rating) return null;
   const {ags} = adjustedGross(r, indexBefore);
@@ -502,6 +547,23 @@ function handicapIndexFrom(diffs){
   else           idx=avg(1)-2.0; // n===3
   return Math.round(idx*10)/10;
 }
+function roundSpan(r){
+  if(r.span) return r.span;                     // '18' | 'F9' | 'B9'
+  return (r.holes||[]).length<=10 ? 'F9' : '18';
+}
+function is18(r){ return roundSpan(r)==='18'; }
+
+/* global stats filter, applied across the Stats tab */
+let STATF = {time:'all', courseId:''};          // time: all | ytd | l90 | l5
+function filteredRounds(){
+  let rs = finishedRounds();
+  if(STATF.courseId) rs = rs.filter(r=>r.courseId===STATF.courseId);
+  if(STATF.time==='ytd'){ const y=new Date().getFullYear(); rs=rs.filter(r=>r.date&&r.date.startsWith(String(y))); }
+  else if(STATF.time==='l90'){ const cut=new Date(Date.now()-90*864e5).toISOString().slice(0,10); rs=rs.filter(r=>r.date>=cut); }
+  else if(STATF.time==='l5'){ rs=rs.slice(-5); }
+  return rs;
+}
+
 function finishedRounds(){
   return S.rounds.filter(r=>r.finished).sort((a,b)=> (a.date+a.id) < (b.date+b.id) ? -1:1);
 }
@@ -536,7 +598,7 @@ let PLAYVIEW='home';        // 'home' | 'hole' | 'overview' | 'roundDetail'
 let VIEWROUND=null;         // round id being viewed (finished)
 const NAVS=[['play','⛳','Play'],['stats','📊','Stats'],['practice','🎯','Practice'],['tips','💡','Tips'],['more','⚙︎','More']];
 
-function go(tab){ TAB=tab; if(tab==='play') PLAYVIEW = S.activeRoundId? 'hole':'home'; render(); window.scrollTo(0,0); }
+function go(tab){ TAB=tab; if(tab==='play') PLAYVIEW='home'; render(); window.scrollTo(0,0); }
 function render(){
   document.body.classList.toggle('hivis', !!S.settings.hiVis);
   $('#nav').innerHTML = NAVS.map(n=>
@@ -555,54 +617,156 @@ function vPlay(){
   if(PLAYVIEW==='hole' && S.activeRoundId) return vHole();
   if(PLAYVIEW==='overview'){ const r=activeRound()||S.rounds.find(x=>x.id===VIEWROUND); if(r) return vOverview(r); }
   if(PLAYVIEW==='roundDetail' && VIEWROUND) return vRoundDetail(VIEWROUND);
+  if(PLAYVIEW==='rounds') return vRoundsList();
+  if(PLAYVIEW==='course' && CID) return vCoursePage();
   return vRoundsHome();
 }
 function activeRound(){ return S.rounds.find(r=>r.id===S.activeRoundId); }
 
+let CID=null;   // course page id
+function lastRoundAt(cid){ const rs=finishedRounds().filter(r=>r.courseId===cid); return rs.length? rs[rs.length-1]:null; }
+
 function vRoundsHome(){
-  const past = [...S.rounds].filter(r=>r.finished).sort((a,b)=> a.date<b.date?1:-1);
   const idx = currentIndex();
   const act = activeRound();
-  let html = `<div class="pageTitle"><h1>Caddie Book</h1><span class="eyebrow num">${idx!=null? 'HCP '+r1(idx):''}</span></div>`;
+  const rs = finishedRounds();
+  // recent courses by last played
+  const recent = [...S.courses].map(c=>({c, last:lastRoundAt(c.id)}))
+    .sort((a,b)=> (b.last?b.last.date:'') > (a.last?a.last.date:'') ? 1:-1).slice(0,8);
+  let hero;
   if(act){
     const d=deriveRound(act);
-    html += `<div class="banner" onclick="PLAYVIEW='hole';render()">▶️ <span><b>Round in progress</b> — ${esc(courseOf(act)?courseOf(act).name:'')} · ${d.played} holes · ${d.toPar>0?'+':''}${d.played?d.toPar:'E'}. Tap to resume.</span></div>`;
+    const h=act.holes[act.curHole-1];
+    hero = `<div class="hero">
+      <div class="k">Round in progress · ${esc(courseOf(act)?courseOf(act).name:'')}</div>
+      <div class="big">${d.played? d.score:'–'} <span style="font-size:20px;opacity:.85">${d.played? (d.toPar===0?'E':(d.toPar>0?'+':'')+d.toPar):''}</span></div>
+      <div class="sub">${d.played}/${act.holes.length} holes · ${d.putts} putts · next up: hole ${h?h.n:'–'}</div>
+      <div class="row" style="gap:8px">
+        <button class="btn" onclick="PLAYVIEW='hole';render()">Resume ▸</button>
+        <button class="btn" style="background:rgba(255,255,255,.16);color:#fff" onclick="PLAYVIEW='overview';render()">Scorecard</button>
+      </div></div>`;
+  } else {
+    const last = rs[rs.length-1];
+    hero = `<div class="hero">
+      <div class="k">Caddie Book${idx!=null? ' · HCP '+r1(idx):''}</div>
+      <div class="big">${last? deriveRound(last).score : '—'}</div>
+      <div class="sub">${last? 'Last round · '+esc(courseOf(last)?courseOf(last).name:'')+' · '+fmtDate(last.date) : 'No rounds yet — everything works offline.'}</div>
+      <button class="btn" onclick="startRoundSheet()" style="min-height:56px;font-size:17px">⛳ Start a round</button>
+    </div>`;
   }
-  html += `<button class="btn primary wide" onclick="startRoundSheet()" style="min-height:60px;font-size:18px">Start a round</button>
-    <div style="height:14px"></div>
-    <div class="card"><div class="hd"><span class="t">Recent rounds</span></div><div class="bd tight">`;
-  if(!past.length) html += `<div style="padding:16px 14px" class="muted">No rounds yet. Start one above — everything works offline.</div>`;
-  else html += past.slice(0,100).map(r=>{
-      const d=deriveRound(r); const c=courseOf(r);
-      return `<div class="listRow" onclick="VIEWROUND='${r.id}';PLAYVIEW='roundDetail';render()">
-        <div class="main"><div class="ti">${esc(c?c.name:'Course')}${r.legacy?' <span class="tag" style="background:var(--sand);color:var(--amber)">18B</span>':''}</div>
-        <div class="sub">${fmtDate(r.date)} · ${d.played} holes · ${d.putts} putts · GIR ${pct(d.girY,d.girD)}</div></div>
-        <div class="num" style="font-size:22px;font-weight:800">${d.score}<span class="muted" style="font-size:13px"> ${d.toPar===0?'E':(d.toPar>0?'+':'')+d.toPar}</span></div>
-        <span class="arr">›</span></div>`;
-    }).join('');
-  html += `</div></div>`;
-  return html;
+  return `${hero}
+  <div class="row" style="justify-content:space-between;align-items:baseline;margin:2px 2px 8px">
+    <span class="eyebrow">Recent courses</span>
+    <button class="btn sm ghost" onclick="mgoCourses()">All courses ›</button></div>
+  <div class="hscroll">${recent.map(x=>{
+      const t=(x.c.tees||[])[0];
+      return `<div class="crsCard" onclick="CID='${x.c.id}';PLAYVIEW='course';render()">
+        <div class="nm">${esc(x.c.name)}</div>
+        <div class="loc">${esc([x.c.info&&x.c.info.city, x.c.info&&x.c.info.state].filter(Boolean).join(', ')||'add location')}</div>
+        <div class="meta">${x.last? fmtDate(x.last.date)+' · '+deriveRound(x.last).score : (t&&t.rating? t.rating+' / '+t.slope : 'no rounds yet')}</div>
+      </div>`;}).join('') || '<div class="muted small" style="padding:8px">Add a course to get started.</div>'}
+  </div>
+  <div class="grid2" style="margin-top:6px">
+    <button class="btn" onclick="PLAYVIEW='rounds';render()">📋 All rounds</button>
+    <button class="btn" onclick="courseEditor(null,false)">＋ New course</button>
+  </div>`;
+}
+function mgoCourses(){ TAB='more'; MOREVIEW='courses'; render(); }
+
+function vRoundsList(){
+  const past=[...S.rounds].filter(r=>r.finished).sort((a,b)=> a.date<b.date?1:-1);
+  return `<button class="btn sm ghost" onclick="PLAYVIEW='home';render()" style="margin-bottom:10px">‹ Play</button>
+  <div class="pageTitle"><h1>All rounds</h1><span class="eyebrow num">${past.length}</span></div>
+  <div class="card"><div class="bd tight">${past.map(r=>{
+    const d=deriveRound(r); const c=courseOf(r); const sp=roundSpan(r);
+    return `<div class="listRow" onclick="VIEWROUND='${r.id}';PLAYVIEW='roundDetail';render()">
+      <div class="main"><div class="ti">${esc(c?c.name:'Course')}${r.legacy?' <span class="tag" style="background:var(--sand);color:var(--amber)">18B</span>':''}${sp!=='18'?' <span class="tag">'+(sp==='B9'?'Back 9':'9')+'</span>':''}</div>
+      <div class="sub">${fmtDate(r.date)} · ${d.putts} putts · GIR ${pct(d.girY,d.girD)}</div></div>
+      <div class="num" style="font-size:21px;font-weight:800">${d.score}<span class="muted" style="font-size:13px"> ${d.toPar===0?'E':(d.toPar>0?'+':'')+d.toPar}</span></div>
+      <span class="arr">›</span></div>`;}).join('')||'<div style="padding:14px" class="muted">No rounds yet.</div>'}</div></div>`;
 }
 
+/* ---------------- course page ---------------- */
+function vCoursePage(){
+  const c=S.courses.find(x=>x.id===CID); if(!c){PLAYVIEW='home';return vRoundsHome();}
+  c.info=c.info||{};
+  const t=(c.tees||[])[0];
+  const rsAll=[...S.rounds].filter(r=>r.finished&&r.courseId===c.id).sort((a,b)=>a.date<b.date?1:-1);
+  const mapsQ=encodeURIComponent([c.name,c.info.city,c.info.state].filter(Boolean).join(' '));
+  // hole-by-hole history across every round here, imports included
+  const hist={};
+  rsAll.forEach(r=>r.holes.forEach(h=>{
+    const sc = r.legacy? h.strokes : deriveHole(h).score;
+    if(sc==null) return;
+    (hist[h.n]=hist[h.n]||[]).push(sc);
+  }));
+  const histRows=Object.keys(hist).map(Number).sort((a,b)=>a-b).map(n=>{
+    const a=hist[n]; const par=t&&t.holes&&t.holes[n-1]? t.holes[n-1].par:null;
+    return `<tr><td class="num">${n}</td><td class="num muted">${par||'–'}</td>
+      <td class="num"><b>${r1(mean(a))}</b></td><td class="num">${Math.min(...a)}</td><td class="num muted">${a.length}</td></tr>`;
+  }).join('');
+  return `<button class="btn sm ghost" onclick="PLAYVIEW='home';render()" style="margin-bottom:10px">‹ Play</button>
+  <div class="pageTitle"><h1>${esc(c.name)}</h1></div>
+  <div class="small muted" style="margin:-8px 2px 12px">${esc([c.info.address,c.info.city,c.info.state].filter(Boolean).join(', ')||'')}
+    ${t&&t.rating? ' · '+esc(t.name)+' '+t.rating+' / '+t.slope:''}</div>
+  <div class="grid3">
+    <button class="btn primary" onclick="startRoundSheet('${c.id}')">Play ▸</button>
+    <a class="btn" style="text-decoration:none" href="https://maps.google.com/?q=${mapsQ}" target="_blank">🧭 Maps</a>
+    <button class="btn" onclick="courseEditor('${c.id}',false)">Edit</button>
+  </div>
+  <div style="height:12px"></div>
+  <div class="card"><div class="hd"><span class="t">Location</span></div><div class="bd">
+    <div class="grid2">
+      <div><label class="f">City</label><input class="f" value="${esc(c.info.city||'')}" onchange="cInfo('${c.id}','city',this.value)"></div>
+      <div><label class="f">State</label><input class="f" value="${esc(c.info.state||'')}" onchange="cInfo('${c.id}','state',this.value)"></div>
+    </div>
+    <label class="f">Address</label><input class="f" value="${esc(c.info.address||'')}" onchange="cInfo('${c.id}','address',this.value)">
+    ${S.settings.gcApiKey? `<div style="height:8px"></div><button class="btn sm wide" onclick="gcFill('${c.id}')">🔎 Fill from golfcourseapi.com</button>`:
+      `<div class="small muted" style="margin-top:8px">Tip: add a free golfcourseapi.com key in Settings and this fills itself, plus rating, slope and every hole.</div>`}
+  </div></div>
+  ${histRows? `<div class="card"><div class="hd"><span class="t">Hole history</span><span class="small muted num">${rsAll.length} rounds</span></div>
+    <div class="bd tight"><table class="data"><tr><th class="num">Hole</th><th class="num">Par</th><th class="num">Avg</th><th class="num">Best</th><th class="num">n</th></tr>${histRows}</table></div></div>`:''}
+  <div class="card"><div class="hd"><span class="t">Rounds here</span></div><div class="bd tight">
+    ${rsAll.slice(0,10).map(r=>{const d=deriveRound(r);
+      return `<div class="listRow" onclick="VIEWROUND='${r.id}';PLAYVIEW='roundDetail';render()">
+        <div class="main"><div class="ti num">${d.score} <span class="muted small">${d.toPar===0?'E':(d.toPar>0?'+':'')+d.toPar}</span></div>
+        <div class="sub">${fmtDate(r.date)} · ${d.putts} putts${r.legacy?' · 18B':''}</div></div><span class="arr">›</span></div>`;}).join('')||'<div style="padding:14px" class="muted">No rounds here yet.</div>'}
+  </div></div>`;
+}
+function cInfo(cid,k,v){ const c=S.courses.find(x=>x.id===cid); c.info=c.info||{}; c.info[k]=v.trim(); save(); }
+
 /* ---------------- start round ---------------- */
-function startRoundSheet(){
+function startRoundSheet(prefCourse){
   if(!S.courses.length) return courseEditor(null, true);
-  const opts = S.courses.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  const opts = S.courses.map(c=>`<option value="${c.id}" ${prefCourse===c.id?'selected':''}>${esc(c.name)}</option>`).join('');
   openSheet(`<div class="sheetHd"><span class="t">Start a round</span><button class="btn sm ghost" onclick="closeSheet()">Close</button></div>
     <label class="f">Course</label>
     <select class="f" id="srCourse" onchange="srTees()">${opts}</select>
     <label class="f">Tee</label>
     <select class="f" id="srTee"></select>
-    <label class="f">Date</label>
-    <input class="f num" type="date" id="srDate" value="${todayISO()}">
-    <label class="f">Conditions (optional)</label>
-    <input class="f" id="srWx" placeholder="Sunny, 78°, breezy">
+    <label class="f">Holes</label>
+    <div class="segs" id="srSpan">
+      <button class="on" data-v="18" onclick="srSeg(this)">Full 18</button>
+      <button data-v="F9" onclick="srSeg(this)">Front 9</button>
+      <button data-v="B9" onclick="srSeg(this)">Back 9</button></div>
+    <label class="f">Entry style</label>
+    <div class="segs" id="srMode">
+      <button ${S.settings.defaultMode!=='basic'?'class="on"':''} data-v="advanced" onclick="srSeg(this)">Shot-by-shot</button>
+      <button ${S.settings.defaultMode==='basic'?'class="on"':''} data-v="basic" onclick="srSeg(this)">Quick score</button></div>
+    <div class="grid2">
+      <div><label class="f">Date</label><input class="f num" type="date" id="srDate" value="${todayISO()}"></div>
+      <div><label class="f">Weather</label><input class="f" id="srWx" placeholder="Sunny, 78°"></div>
+    </div>
+    <label class="f">Playing with</label>
+    <input class="f" id="srWith" placeholder="Rachel, Jack…">
     <div style="height:14px"></div>
     <button class="btn primary wide" onclick="startRound()">Tee off</button>
     <div style="height:8px"></div>
     <button class="btn wide ghost" onclick="courseEditor(null,true)">＋ New course instead</button>`);
   srTees();
 }
+function srSeg(btn){ [...btn.parentElement.children].forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
+function srSegVal(id){ const b=document.querySelector('#'+id+' button.on'); return b? b.dataset.v : null; }
 function srTees(){
   const c=S.courses.find(c=>c.id===$('#srCourse').value);
   const ts=(c.tees||[]);
@@ -613,9 +777,13 @@ function startRound(){
   const c=S.courses.find(c=>c.id===$('#srCourse').value);
   const t=(c.tees||[]).find(t=>t.id===$('#srTee').value);
   if(!t){ toast('Add tee details for this course first.'); courseEditor(c.id, true); return; }
+  const span=srSegVal('srSpan')||'18';
+  const src9 = span==='F9'? t.holes.slice(0,9) : span==='B9'? t.holes.slice(9,18) : t.holes;
   const r={id:uid(), courseId:c.id, teeId:t.id, date:$('#srDate').value||todayISO(),
     weather:$('#srWx').value.trim(), notes:'', finished:false, curHole:1,
-    holes:t.holes.map(h=>({n:h.n,par:h.par,ydg:h.ydg,si:h.si,windD:'',windS:0,shots:[],pen:0,ov:{}}))};
+    span, mode:srSegVal('srMode')||S.settings.defaultMode,
+    ctx:{partners:$('#srWith').value.trim(), drinks:0, vibe:0},
+    holes:src9.map(h=>({n:h.n,par:h.par,ydg:h.ydg,si:h.si,windD:'',windS:0,shots:[],pen:0,ov:{}}))};
   S.rounds.push(r); S.activeRoundId=r.id; PLAYVIEW='hole'; closeSheet(); render();
 }
 
@@ -625,8 +793,9 @@ function startRound(){
 let CE=null; // {courseId|null, name, teeName, rating, slope, holes[], startAfter}
 function courseEditor(courseId, startAfter){
   CE={courseId, startAfter:!!startAfter, name:'', teeName:'White', rating:'', slope:'',
+      info:{address:'',city:'',state:''},
       holes:Array.from({length:18},(_,i)=>({n:i+1,par:4,ydg:'',si:''}))};
-  if(courseId){ const c=S.courses.find(x=>x.id===courseId); CE.name=c.name;
+  if(courseId){ const c=S.courses.find(x=>x.id===courseId); CE.name=c.name; CE.info=Object.assign({address:'',city:'',state:''}, c.info||{});
     const t=c.tees[0]; if(t){CE.teeName=t.name;CE.rating=t.rating;CE.slope=t.slope;CE.holes=t.holes.map(h=>({...h}));} }
   renderCourseEditor();
 }
@@ -639,6 +808,11 @@ function renderCourseEditor(){
   </tr>` + (h.n===9?`<tr><td colspan="4" style="border-top:2px solid var(--ink)"></td></tr>`:'')).join('');
   openSheet(`<div class="sheetHd"><span class="t">${CE.courseId?'Edit course':'New course'}</span><button class="btn sm ghost" onclick="closeSheet()">Cancel</button></div>
     <label class="f">Course name</label><input class="f" id="ceName" value="${esc(CE.name)}" placeholder="Fossil Trace">
+    ${S.settings.gcApiKey? `<div style="margin-top:8px"><button class="btn sm wide" onclick="gcSearch()">🔎 Look up online (fills everything)</button></div>`:''}
+    <div class="grid2">
+      <div><label class="f">City</label><input class="f" id="ceCity" value="${esc(CE.info.city||'')}"></div>
+      <div><label class="f">State</label><input class="f" id="ceState" value="${esc(CE.info.state||'')}"></div>
+    </div>
     <div class="grid3">
       <div><label class="f">Tee</label><input class="f" id="ceTee" value="${esc(CE.teeName)}"></div>
       <div><label class="f">Rating</label><input class="f num" id="ceRating" inputmode="decimal" value="${CE.rating||''}" placeholder="71.2"></div>
@@ -656,6 +830,8 @@ function renderCourseEditor(){
 function cePar(i,p){ CE.holes[i].par=p; ceGrab(); renderCourseEditor(); }
 function ceSet(i,k,v){ CE.holes[i][k]=parseInt(v)||''; }
 function ceGrab(){ CE.name=$('#ceName').value; CE.teeName=$('#ceTee').value; CE.rating=$('#ceRating').value; CE.slope=$('#ceSlope').value;
+  if($('#ceCity')) CE.info.city=$('#ceCity').value.trim();
+  if($('#ceState')) CE.info.state=$('#ceState').value.trim();
   document.querySelectorAll('.crsGrid input').forEach((inp,j)=>{ const i=Math.floor(j/2); if(j%2===0)CE.holes[i].ydg=parseInt(inp.value)||''; else CE.holes[i].si=parseInt(inp.value)||''; }); }
 function cePasteUI(){
   ceGrab();
@@ -704,9 +880,11 @@ function ceSave(){
   const teeObj={id:uid(), name:CE.teeName.trim()||'Tee', rating:parseFloat(CE.rating)||null, slope:parseInt(CE.slope)||null,
     holes:CE.holes.map(h=>({n:h.n,par:h.par,ydg:parseInt(h.ydg)||null,si:parseInt(h.si)||null}))};
   if(CE.courseId){
-    const c=S.courses.find(x=>x.id===CE.courseId); c.name=CE.name.trim(); c.tees[0]=Object.assign(c.tees[0]||{}, teeObj, {id:(c.tees[0]||teeObj).id});
+    const c=S.courses.find(x=>x.id===CE.courseId); c.name=CE.name.trim();
+    c.info=Object.assign(c.info||{}, CE.info);
+    c.tees[0]=Object.assign(c.tees[0]||{}, teeObj, {id:(c.tees[0]||teeObj).id});
   } else {
-    S.courses.push({id:uid(), name:CE.name.trim(), tees:[teeObj]});
+    S.courses.push({id:uid(), name:CE.name.trim(), info:{...CE.info}, tees:[teeObj]});
   }
   save(); closeSheet();
   if(CE.startAfter) startRoundSheet(); else render();
@@ -721,6 +899,45 @@ function vHole(){
   const d=deriveHole(h);
   const rd=deriveRound(r);
   const pin = S.tips.find(t=>t.pinned);
+  const mode = r.mode||'advanced';
+  const hist = holeHistory(r.courseId, h.n, r.id);
+  const windChips = WINDS.map(w=>`<button class="chip sm ${h.windD===w[0]?'on':''}" onclick="setWind('${w[0]}')">${w[1]}</button>`).join('')
+    + (h.windD? [1,2,3].map(n=>`<button class="chip sm ${h.windS===n?'on':''}" onclick="setWindS(${n})">${n}</button>`).join(''):'');
+  return `
+  <div class="row" style="justify-content:space-between;margin-bottom:8px">
+    <button class="btn sm ghost" onclick="PLAYVIEW='home';render()">‹ Play</button>
+    <div class="segs" style="flex:0 0 190px">
+      <button ${mode==='advanced'?'class="on"':''} onclick="setMode('advanced')">Shots</button>
+      <button ${mode==='basic'?'class="on"':''} onclick="setMode('basic')">Quick</button></div>
+    <button class="btn sm" onclick="PLAYVIEW='overview';render()">▦</button>
+  </div>
+  ${pin? `<div class="banner" onclick="go('tips')">💡 <span><b>${esc(pin.title)}</b></span></div>`:''}
+  <div class="holeHd">
+    <div class="holeNo"><span class="h">Hole</span><span class="n">${h.n}</span></div>
+    <div class="holeMeta">
+      <div><div class="k">Par</div><div class="v">${h.par}</div></div>
+      <div><div class="k">Yards</div><div class="v">${h.ydg||'–'}</div></div>
+      <div><div class="k">SI</div><div class="v">${h.si||'–'}</div></div>
+    </div>
+  </div>
+  ${hist.n? `<div class="histLine">📖 <span>You've played this hole <b>${hist.n}×</b> · avg <b>${r1(hist.avg)}</b> · best <b>${hist.best}</b></span></div>`:''}
+  <div class="chips" style="margin-bottom:10px"><span class="small muted" style="align-self:center">Wind</span>${windChips}
+    <button class="chip sm" onclick="addDrink()">🍺 ${r.ctx&&r.ctx.drinks? r.ctx.drinks:''}＋</button></div>
+  ${mode==='basic'? vBasicPanel(r,h,d) : vShotsPanel(r,h,d)}
+  <div class="statChips">
+    <span class="stat ${d.fir==='Y'?'good':d.fir==='N'?'bad':''}" onclick="cycleOv('fir')">FIR <b>${d.fir||'–'}</b></span>
+    <span class="stat ${d.gir==='Y'?'good':d.gir==='N'?'bad':''}" onclick="cycleOv('gir')">GIR <b>${d.gir||'–'}</b></span>
+    <span class="stat">Putts <b>${d.putts}</b></span>
+    ${d.threePutt?'<span class="stat bad">3-putt</span>':''}
+    ${d.udA?`<span class="stat ${d.udM?'good':'bad'}" onclick="cycleOv('ud')">U&D <b>${d.udM?'✓':'✗'}</b></span>`:''}
+  </div>
+  <div class="grid3">
+    <button class="btn" ${r.curHole===1?'disabled style="opacity:.35"':''} onclick="navHole(-1)">‹</button>
+    <div class="center"><div class="small muted">Round</div><div class="num" style="font-size:20px;font-weight:800">${rd.played? rd.score+' · '+(rd.toPar===0?'E':(rd.toPar>0?'+':'')+rd.toPar):'—'}</div></div>
+    <button class="btn primary" onclick="navHole(1)">${r.curHole===r.holes.length?'Finish ▸':'›'}</button>
+  </div>`;
+}
+function vShotsPanel(r,h,d){
   const shotRows = h.shots.map((s,i)=>{
     const fin = s.fType==='lat'? (s.lat||'') : s.fType==='green'? (s.pad? s.pad+'g':'') : s.fType==='putt'? (s.pad? s.pad+'p':'') : '';
     const extras=[s.shape?('shp'+s.shape):'', s.frac||'', s.effort?('e'+s.effort):'', s.strike||''].filter(Boolean).join(' ');
@@ -732,53 +949,67 @@ function vHole(){
       <span class="muted small">${extras}</span></div>`;
   }).join('');
   const penRow = d.pen? `<div class="shotRow penRow" onclick="adjPen(-1)"><span class="sn">＋</span><span class="lie">PEN</span><span class="grow">${d.pen} penalty stroke${d.pen>1?'s':''}</span><span class="muted small">tap to remove</span></div>`:'';
-  const windChips = WINDS.map(w=>`<button class="chip sm ${h.windD===w[0]?'on':''}" onclick="setWind('${w[0]}')">${w[1]}</button>`).join('')
-    + (h.windD? [1,2,3].map(n=>`<button class="chip sm ${h.windS===n?'on':''}" onclick="setWindS(${n})">${n}</button>`).join(''):'');
-  return `
-  <div class="row" style="justify-content:space-between;margin-bottom:8px">
-    <button class="btn sm ghost" onclick="PLAYVIEW='home';render()">‹ Rounds</button>
-    <span class="eyebrow">${esc(courseOf(r)?courseOf(r).name:'')}</span>
-    <button class="btn sm" onclick="PLAYVIEW='overview';render()">18 ▦</button>
-  </div>
-  ${pin? `<div class="banner" onclick="go('tips')">💡 <span><b>${esc(pin.title)}</b>${pin.body? ' — '+esc(pin.body.slice(0,80))+(pin.body.length>80?'…':''):''}</span></div>`:''}
-  <div class="holeHd">
-    <div class="holeNo"><span class="h">Hole</span><span class="n">${h.n}</span></div>
-    <div class="holeMeta">
-      <div><div class="k">Par</div><div class="v">${h.par}</div></div>
-      <div><div class="k">Yards</div><div class="v">${h.ydg||'–'}</div></div>
-      <div><div class="k">SI</div><div class="v">${h.si||'–'}</div></div>
-    </div>
-  </div>
-  <div class="chips" style="margin-bottom:10px"><span class="small muted" style="align-self:center">Wind</span>${windChips}</div>
-  <div class="card"><div class="hd"><span class="t">Shots</span>
+  return `<div class="card"><div class="hd"><span class="t">Shots</span>
       <span class="num" style="font-weight:800">${d.score!=null? d.score+' ('+(d.toPar===0?'E':(d.toPar>0?'+':'')+d.toPar)+')':''}</span></div>
     <div class="bd tight">${shotRows||'<div style="padding:14px" class="muted">No shots yet — tap Add shot.</div>'}${penRow}</div>
   </div>
-  <div class="grid2">
-    <button class="btn primary" style="min-height:64px;font-size:19px" onclick="newShot()">＋ Add shot</button>
+  <div class="grid2" style="margin-bottom:10px">
+    <button class="btn primary" style="min-height:62px;font-size:18px" onclick="newShot()">＋ Add shot</button>
     <button class="btn danger" onclick="penaltyDrop()">Penalty + drop</button>
-  </div>
-  <div class="statChips">
-    <span class="stat ${d.fir==='Y'?'good':d.fir==='N'?'bad':''}" onclick="cycleOv('fir')">FIR <b>${d.fir||'–'}</b></span>
-    <span class="stat ${d.gir==='Y'?'good':d.gir==='N'?'bad':''}" onclick="cycleOv('gir')">GIR <b>${d.gir||'–'}</b></span>
-    <span class="stat">Putts <b>${d.putts}</b></span>
-    ${d.threePutt?'<span class="stat bad">3-putt</span>':''}
-    ${d.udA?`<span class="stat ${d.udM?'good':'bad'}" onclick="cycleOv('ud')">U&D <b>${d.udM?'✓':'✗'}</b></span>`:''}
-    ${d.sand?`<span class="stat">Sand <b>${d.sand}</b></span>`:''}
-  </div>
-  <div class="grid3">
-    <button class="btn" ${h.n===1?'disabled style="opacity:.35"':''} onclick="navHole(-1)">‹ ${h.n-1||''}</button>
-    <div class="center"><div class="small muted">Round</div><div class="num" style="font-size:20px;font-weight:800">${rd.played? rd.score+' · '+(rd.toPar===0?'E':(rd.toPar>0?'+':'')+rd.toPar):'—'}</div></div>
-    <button class="btn primary" onclick="navHole(1)">${h.n===18?'Finish ▸':(h.n+1)+' ›'}</button>
   </div>`;
+}
+/* quick-score entry: score, putts, first putt ft, FIR, approach pad, sand, pen */
+function vBasicPanel(r,h,d){
+  const ov=h.ov=h.ov||{};
+  const scores=[]; for(let s=Math.max(1,h.par-2); s<=h.par+4; s++) scores.push(s);
+  const scBtns=scores.map(s=>{const rel=s-h.par;
+    const lab= rel===0?'par': rel===-1?'birdie': rel===-2?'eagle': rel===1?'bogey': rel===2?'dbl': '+'+rel;
+    return `<button class="${ov.score===s?'on':''}" onclick="bset('score',${s})">${s}<span class="sub">${lab}</span></button>`;}).join('');
+  const puttBtns=[0,1,2,3,4].map(p=>`<button class="${ov.putts===p?'on':''}" onclick="bset('putts',${p})">${p===4?'4+':p}</button>`).join('');
+  const fpChips=[3,5,8,10,15,20,25,30,40,50].map(f=>`<button class="chip sm ${ov.firstPuttFt===f?'on':''}" onclick="bset('firstPuttFt',${f})">${f}</button>`).join('');
+  return `<div class="card"><div class="bd">
+    <div class="sec" style="margin-top:0">Score</div><div class="qgrid">${scBtns}</div>
+    <div class="sec">Putts</div><div class="qgrid">${puttBtns}</div>
+    <div class="sec">First putt (ft)</div><div class="chips">${fpChips}</div>
+    ${h.par>3? `<div class="sec">Fairway</div><div class="chips">
+      <button class="chip ${ov.fir==='Y'?'on':''}" onclick="bset('fir','Y')">✓ Hit</button>
+      <button class="chip ${ov.fir==='N'?'on':''}" onclick="bset('fir','N')">✗ Missed</button></div>`:''}
+    <div class="sec">Approach vs pin — 5 = on, pin high</div>
+    ${padHTML('green', ov.girPad, 'bPad')}
+    <div class="sec">Trouble</div>
+    <div class="chips">
+      <button class="chip sm" onclick="bstep('sand',1)">Sand ${ov.sand||0} ＋</button>
+      <button class="chip sm" onclick="bstep('pen',1)">Penalty ${ov.pen||0} ＋</button>
+      <button class="chip sm ghost" onclick="bclear()">Reset hole</button>
+    </div>
+  </div></div>`;
+}
+function bset(k,v){ const h=curHole(); h.ov=h.ov||{};
+  h.ov[k] = h.ov[k]===v? undefined : v;
+  if(h.ov[k]===undefined) delete h.ov[k];
+  render(); }
+function bstep(k,dv){ const h=curHole(); h.ov=h.ov||{}; h.ov[k]=Math.max(0,(h.ov[k]||0)+dv); render(); }
+function bclear(){ const h=curHole(); h.ov={}; render(); }
+function bPad(dgt){ const h=curHole(); h.ov=h.ov||{};
+  if(h.ov.girPad===dgt){ delete h.ov.girPad; delete h.ov.gir; }
+  else { h.ov.girPad=dgt; h.ov.gir = dgt===5? 'Y':'N'; }
+  render(); }
+function setMode(m){ activeRound().mode=m; render(); }
+function addDrink(){ const r=activeRound(); r.ctx=r.ctx||{drinks:0}; r.ctx.drinks=(r.ctx.drinks||0)+1; render(); }
+function holeHistory(courseId, holeN, excludeId){
+  const scores=[];
+  S.rounds.forEach(r=>{ if(!r.finished||r.courseId!==courseId||r.id===excludeId) return;
+    (r.holes||[]).forEach(h=>{ if(h.n!==holeN) return;
+      const sc=r.legacy? h.strokes : deriveHole(h).score; if(sc!=null) scores.push(sc); }); });
+  return {n:scores.length, avg:mean(scores), best:scores.length?Math.min(...scores):null};
 }
 function setWind(w){ const h=curHole(); h.windD = h.windD===w? '':w; if(!h.windD)h.windS=0; else if(!h.windS)h.windS=1; render(); }
 function setWindS(n){ curHole().windS=n; render(); }
 function curHole(){ const r=activeRound(); return r.holes[r.curHole-1]; }
 function navHole(dir){
-  const r=activeRound();
-  if(dir>0 && r.curHole===18){ PLAYVIEW='overview'; render(); return; }
-  r.curHole=Math.min(18,Math.max(1,r.curHole+dir)); render();
+  const r=activeRound(); const nH=r.holes.length;
+  if(dir>0 && r.curHole===nH){ PLAYVIEW='overview'; render(); return; }
+  r.curHole=Math.min(nH,Math.max(1,r.curHole+dir)); render();
 }
 function adjPen(d){ const h=curHole(); h.pen=Math.max(0,(h.pen||0)+d); render(); }
 function penaltyDrop(){ const h=curHole(); h.pen=(h.pen||0)+1; render(); newShot('HZ'); }
@@ -874,6 +1105,7 @@ function renderShotSheet(){
       <button class="btn sm ghost" onclick="closeSheet()">Cancel</button></div>
     <div class="sec">Lie — hit from</div><div class="chips">${lieChips}</div>
     <div class="sec">Distance</div>${keyp}
+    ${s.lie==='GR'? `<div style="margin-top:8px"><button class="chip sm" onclick="tapIn()">⛳ Tap-in (2 ft, made)</button></div>`:''}
     <div class="sec">Club</div><div class="chips">${clubChips}</div>
     <div class="sec">Finish — where it ended up</div>${fSwitch}${finish}
     <div style="height:10px"></div>
@@ -959,11 +1191,17 @@ function vOverview(r){
         <span>U&D <b class="num">${rd.udA? rd.udM+'/'+rd.udA:'–'}</b></span>
         <span>Pen <b class="num">${rd.pen}</b></span></div>
     </div></div>
+    ${active&&r.ctx? `<div class="card"><div class="bd"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span class="small">Vibe <span class="stars">${[1,2,3,4,5].map(v=>`<button class="${(r.ctx.vibe||0)>=v?'on':''}" onclick="rVibe('${r.id}',${v})">⭐</button>`).join('')}</span></span>
+      <span class="small">🍺 <b class="num">${r.ctx.drinks||0}</b></span>
+      ${r.ctx.partners?`<span class="small">👥 ${esc(r.ctx.partners)}</span>`:''}
+    </div></div></div>`:''}
     ${active? `<button class="btn primary wide" style="min-height:60px" onclick="finishRound()">Finish round ✔</button>
       <div style="height:8px"></div><button class="btn wide danger" onclick="if(confirm('Discard this round entirely?')){S.rounds=S.rounds.filter(x=>x.id!=='${r.id}');S.activeRoundId=null;PLAYVIEW='home';render();}">Discard round</button>`
     : `<button class="btn wide" onclick="exportRoundText('${r.id}')">Copy AI text export</button>`}`;
 }
-function jumpHole(n){ const r=activeRound()||S.rounds.find(x=>x.id===VIEWROUND); if(!r.finished){ r.curHole=n; PLAYVIEW='hole'; render(); } }
+function jumpHole(n){ const r=activeRound()||S.rounds.find(x=>x.id===VIEWROUND); if(!r||r.finished) return;
+  const i=r.holes.findIndex(h=>h.n===n); if(i>=0){ r.curHole=i+1; PLAYVIEW='hole'; render(); } }
 function finishRound(){
   const r=activeRound(); r.finished=true; S.activeRoundId=null;
   handicapTimeline(); // stamps _diff
@@ -988,7 +1226,7 @@ function vRoundDetail(id){
     <button class="btn sm" onclick="VIEWROUND='${r.id}';PLAYVIEW='overview';render()">Overview ▦</button></div>
     <div class="pageTitle"><h1>${esc(courseOf(r)?courseOf(r).name:'Round')}</h1>
       <span class="num" style="font-size:24px;font-weight:800">${rd.score}</span></div>
-    <div class="small muted" style="margin:-8px 2px 12px">${fmtDate(r.date)} · ${esc(teeOf(r)?teeOf(r).name:'')} tees${r._diff!=null? ' · differential '+r1(r._diff):''}${r.weather? ' · '+esc(r.weather):''}</div>
+    <div class="small muted" style="margin:-8px 2px 12px">${fmtDate(r.date)} · ${esc(teeOf(r)?teeOf(r).name:'')} tees${roundSpan(r)!=='18'?' · '+(roundSpan(r)==='B9'?'back 9':'front 9'):''}${r._diff!=null? ' · differential '+r1(r._diff):''}${r.weather? ' · '+esc(r.weather):''}${r.ctx&&r.ctx.partners? ' · with '+esc(r.ctx.partners):''}${r.ctx&&r.ctx.vibe? ' · '+'⭐'.repeat(r.ctx.vibe):''}${r.ctx&&r.ctx.drinks? ' · 🍺'+r.ctx.drinks:''}</div>
     <div class="card"><div class="bd tight">${holes}</div></div>
     <div class="grid2"><button class="btn" onclick="exportRoundText('${r.id}')">Copy AI text</button>
     <button class="btn" onclick="reopenRound('${r.id}')">Reopen to edit</button></div>
@@ -1020,6 +1258,52 @@ function vLegacyDetail(r){
   </div></div>
   <button class="btn wide danger sm" onclick="if(confirm('Delete this imported round?')){S.rounds=S.rounds.filter(x=>x.id!=='${r.id}');PLAYVIEW='home';render();}">Delete round</button>`;
 }
+
+function rVibe(id,v){ const r=S.rounds.find(x=>x.id===id); r.ctx=r.ctx||{}; r.ctx.vibe=v; render(); }
+
+function tapIn(){ SH.distStr='2'; SH.s.dist=2; SH.s.pad=5; SH.s.fType='putt'; saveShot(); }
+
+/* Online course lookup via golfcourseapi.com — optional; offline paths stand alone. */
+let GCRES=null;
+async function gcApi(path){
+  const res = await fetch('https://api.golfcourseapi.com/v1/'+path, {headers:{'Authorization':'Key '+S.settings.gcApiKey}});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return res.json();
+}
+async function gcSearch(){
+  ceGrab();
+  const q = CE.name.trim(); if(!q){ toast('Type the course name first.'); return; }
+  toast('Searching…');
+  try{
+    const data = await gcApi('search?search_query='+encodeURIComponent(q));
+    GCRES = (data.courses||[]).slice(0,5);
+    if(!GCRES.length){ toast('No matches. Paste or type it instead.'); return; }
+    openSheet(`<div class="sheetHd"><span class="t">Pick your course</span><button class="btn sm ghost" onclick="renderCourseEditor()">Back</button></div>
+      ${GCRES.map((c,i)=>{
+        const tees=((c.tees&&c.tees.male)||[]).concat((c.tees&&c.tees.female)||[]);
+        return `<div class="card"><div class="bd">
+          <div style="font-weight:800">${esc(c.club_name||'')}${c.course_name&&c.course_name!==c.club_name? ' — '+esc(c.course_name):''}</div>
+          <div class="small muted">${esc([c.location&&c.location.city, c.location&&c.location.state].filter(Boolean).join(', '))}</div>
+          <div class="chips" style="margin-top:8px">${tees.map((t,j)=>`<button class="chip sm" onclick="gcApply(${i},${j})">${esc(t.tee_name)} · ${t.course_rating||'?'} / ${t.slope_rating||'?'}</button>`).join('')||'<span class="small muted">no tee data</span>'}</div>
+        </div></div>`;}).join('')}`);
+  }catch(e){
+    toast('Lookup failed ('+e.message+'). If this keeps happening the API may block browser requests — the paste import always works.');
+  }
+}
+function gcApply(ci,ti){
+  const c=GCRES[ci];
+  const tees=((c.tees&&c.tees.male)||[]).concat((c.tees&&c.tees.female)||[]);
+  const t=tees[ti]; if(!t) return;
+  CE.name = CE.name || c.club_name || '';
+  if(!CE.name.trim()) CE.name = c.club_name||c.course_name||'';
+  CE.teeName = t.tee_name||'Tee';
+  CE.rating = t.course_rating||''; CE.slope = t.slope_rating||'';
+  CE.info = {address:(c.location&&c.location.address)||'', city:(c.location&&c.location.city)||'', state:(c.location&&c.location.state)||''};
+  (t.holes||[]).slice(0,18).forEach((hh,i)=>{ CE.holes[i]={n:i+1, par:hh.par||4, ydg:hh.yardage||'', si:hh.handicap||''}; });
+  renderCourseEditor();
+  toast('Filled from golfcourseapi.com — verify the grid.');
+}
+function gcFill(courseId){ courseEditor(courseId,false); setTimeout(gcSearch, 50); }
 /* ============================================================
    STATS TAB
    ============================================================ */
@@ -1031,24 +1315,31 @@ function allShots(spanRounds){
   rs.forEach(r=> r.holes.forEach(h=> (h.shots||[]).forEach(s=> out.push({r,h,s}))));
   return out;
 }
-function spanRoundsFor(span){
-  const rs=finishedRounds();
-  if(span==='5') return rs.slice(-5);
-  if(span==='20') return rs.slice(-20);
-  return rs;
-}
 
+
+function statFilterBar(){
+  const times=[['all','All time'],['ytd','This year'],['l90','90 days'],['l5','Last 5']];
+  const courses=[...new Set(finishedRounds().map(r=>r.courseId))].map(id=>S.courses.find(c=>c.id===id)).filter(Boolean);
+  return `<div class="chips" style="margin-bottom:10px">
+    ${times.map(t=>`<button class="chip sm ${STATF.time===t[0]?'on':''}" onclick="STATF.time='${t[0]}';render()">${t[1]}</button>`).join('')}
+  </div>
+  ${courses.length>1? `<select class="f" style="min-height:44px;margin-bottom:12px" onchange="STATF.courseId=this.value;render()">
+    <option value="">All courses</option>
+    ${courses.map(c=>`<option value="${c.id}" ${STATF.courseId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:''}`;
+}
 function vStats(){
-  const rs=finishedRounds();
-  if(!rs.length) return `<div class="pageTitle"><h1>Stats</h1></div>
-    <div class="card"><div class="bd"><p class="muted">Finish a round and this page fills itself in: handicap, scoring, putting, heatmaps, stock yardages, the wedge matrix.</p></div></div>`;
+  const rs=filteredRounds();
+  if(!rs.length) return `<div class="pageTitle"><h1>Stats</h1></div>${statFilterBar()}
+    <div class="card"><div class="bd"><p class="muted">No rounds match this filter yet. Finish a round and this page fills itself in: handicap, scoring, putting, heatmaps, stock yardages, the wedge matrix.</p></div></div>`;
   const tl=handicapTimeline();
   const idx=currentIndex();
   const rds=rs.map(r=>deriveRound(r));
   const n=rs.length;
-  const avg = k => mean(rds.map(d=>d[k]));
-  const scores=rds.map(d=>d.score);
-  const toPars=rds.map(d=>d.toPar);
+  const r18=rs.filter(is18), r9=rs.filter(r=>!is18(r));
+  const d18=r18.map(deriveRound), d9=r9.map(deriveRound);
+  const scores18=d18.map(d=>d.score), scores9=d9.map(d=>d.score);
+  const totHoles=rds.reduce((s,d)=>s+d.played,0);
+  const per18=(tot)=> totHoles? tot/totHoles*18 : null;
 
   const shotRs = rs.filter(r=>!r.legacy);             // rounds with full shot detail
   const nShot = shotRs.length, nLegacy = n-nShot;
@@ -1080,7 +1371,8 @@ function vStats(){
       <td class="num">${pct(g.filter(x=>x.putts>=3).length,g.length)}</td></tr>`;
   }).join('');
 
-  return `<div class="pageTitle"><h1>Stats</h1><span class="eyebrow">${n} round${n>1?'s':''}${nLegacy?` · ${nLegacy} imported`:''}</span></div>
+  return `<div class="pageTitle"><h1>Stats</h1><span class="eyebrow">${r18.length}×18 ${r9.length?'· '+r9.length+'×9 ':''}${nLegacy?'· '+nLegacy+' imported':''}</span></div>
+  ${statFilterBar()}
 
   <div class="card"><div class="hd"><span class="t">Handicap</span>
       <span class="num" style="font-size:20px;font-weight:800">${idx!=null? r1(idx):'–'}</span></div>
@@ -1093,12 +1385,13 @@ function vStats(){
 
   <div class="card"><div class="hd"><span class="t">Scoring</span></div><div class="bd">
     <div class="grid4 center">
-      ${bignum(r1(mean(scores)),'avg score')}
-      ${bignum((mean(toPars)>=0?'+':'')+r1(mean(toPars)),'to par')}
-      ${bignum(Math.min(...scores),'best')}
-      ${bignum(r1(agg.pen/n),'pen/rd')}
+      ${bignum(r1(per18(rds.reduce((s,d)=>s+d.score,0))),'avg /18')}
+      ${bignum((()=>{const v=per18(rds.reduce((s,d)=>s+d.toPar,0));return v==null?'–':(v>=0?'+':'')+r1(v);})(),'to par /18')}
+      ${bignum(scores18.length? Math.min(...scores18):'–','best 18')}
+      ${bignum(r1(per18(agg.pen)),'pen /18')}
     </div><hr class="sep">
-    ${spark(scores)}
+    ${spark(rds.map(d=>d.played? d.score/d.played*18 : null).filter(x=>x!=null))}
+    <div class="small muted">Every round normalized to 18 holes${r9.length? ' — nines count as half a round, not a sub-70 miracle':''}.</div>
     <hr class="sep">
     <div class="row small" style="flex-wrap:wrap;gap:12px">
       <span>Par 3 <b class="num">${r1(mean(byPar[3]))}</b></span>
@@ -1122,7 +1415,7 @@ function vStats(){
 
   <div class="card"><div class="hd"><span class="t">Putting</span></div><div class="bd">
     <div class="grid3 center">
-      ${bignum(r1(agg.putts/n),'putts/rd')}
+      ${bignum(r1(per18(agg.putts)),'putts /18')}
       ${bignum(r1(mean(pGIR)),'putts/GIR')}
       ${bignum(pct(agg.tp,agg.holes),'3-putt')}
     </div><hr class="sep">
@@ -1130,9 +1423,39 @@ function vStats(){
     <table class="data"><tr><th class="num">Dist</th><th class="num">n</th><th class="num">Make</th><th class="num">Avg putts</th><th class="num">3-putt</th></tr>${bRows}</table>
   </div></div>
 
+  ${hotClubsCard(rs)}
   ${heatmapCard()}
   ${stockYardCard()}
   ${wedgeMatrixCard()}`;
+}
+
+/* ---------------- club form: best clubs + hot streaks ---------------- */
+function hotClubsCard(rs){
+  const shotRs = rs.filter(r=>!r.legacy);
+  if(!shotRs.length) return '';
+  const recent = new Set(shotRs.slice(-5).map(r=>r.id));
+  const byClub = {};
+  shotRs.forEach(r=>r.holes.forEach(h=>(h.shots||[]).forEach(s=>{
+    if(s.fType!=='green'||!s.pad||!s.clubId) return;
+    const b = byClub[s.clubId]=byClub[s.clubId]||{n:0,pure:0,rn:0,rp:0};
+    b.n++; if(s.pad===5) b.pure++;
+    if(recent.has(r.id)){ b.rn++; if(s.pad===5) b.rp++; }
+  })));
+  const rows = Object.entries(byClub).filter(([,b])=>b.n>=5)
+    .map(([cid,b])=>({cid, n:b.n, pure:b.pure/b.n, rPure:b.rn>=3? b.rp/b.rn:null}))
+    .sort((a,b)=>b.pure-a.pure).slice(0,6);
+  if(!rows.length) return '';
+  return `<div class="card"><div class="hd"><span class="t">Club form — green attempts</span></div><div class="bd tight">
+    <table class="data"><tr><th>Club</th><th class="num">Attempts</th><th class="num">Pin-high %</th><th class="num">Last 5 rds</th></tr>
+    ${rows.map(x=>{
+      const hot = x.rPure!=null && x.rPure > x.pure+0.10;
+      const cold = x.rPure!=null && x.rPure < x.pure-0.10;
+      return `<tr><td><b>${esc(clubLabel(x.cid))}</b>${hot?' <span class="flame">🔥</span>':cold?' ❄️':''}</td>
+        <td class="num">${x.n}</td><td class="num"><b>${Math.round(x.pure*100)}%</b></td>
+        <td class="num">${x.rPure!=null? Math.round(x.rPure*100)+'%':'–'}</td></tr>`;}).join('')}
+    </table>
+    <div class="small muted" style="padding:8px 12px">Pin-high = finished 5 on the green pad. 🔥 running 10+ points above baseline over the last five rounds; ❄️ the opposite. Minimum 5 attempts.</div>
+  </div></div>`;
 }
 function bignum(v,l){ return `<div><div class="num" style="font-size:24px;font-weight:800">${v}</div><div class="small muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700">${l}</div></div>`; }
 function courseHcpLine(idx){
@@ -1156,7 +1479,7 @@ function spark(vals){
 /* ---------------- heatmaps ---------------- */
 function heatmapCard(){
   const kinds=[['green','Green'],['putt','Putt'],['shape','Shape']];
-  const spanRs = spanRoundsFor(HM.span);
+  const spanRs = filteredRounds();
   const rows = allShots(spanRs);
   let counts={},total=0, latCounts=null;
   if(HM.kind==='shape'){
@@ -1165,6 +1488,8 @@ function heatmapCard(){
   } else if(HM.kind==='green'){
     rows.forEach(x=>{ if(x.s.fType!=='green'||!x.s.pad)return; if(HM.clubId&&x.s.clubId!==HM.clubId)return; if(!bandOK(x.s))return;
       counts[x.s.pad]=(counts[x.s.pad]||0)+1; total++; });
+    if(!HM.clubId && !HM.band) spanRs.forEach(r=>!r.legacy&&r.holes.forEach(h=>{   // quick-score rounds contribute too
+      if(h.ov&&h.ov.girPad){ counts[h.ov.girPad]=(counts[h.ov.girPad]||0)+1; total++; }}));
   } else {
     rows.forEach(x=>{ if(x.s.fType!=='putt'||!x.s.pad)return; if(!bandOKputt(x.s))return;
       counts[x.s.pad]=(counts[x.s.pad]||0)+1; total++; });
@@ -1184,8 +1509,7 @@ function heatmapCard(){
   const clubOpts = `<option value="">All clubs</option>`+S.clubs.filter(c=>c.type!=='P').map(c=>`<option value="${c.id}" ${HM.clubId===c.id?'selected':''}>${esc(c.label)}</option>`).join('');
   const bands = HM.kind==='putt'? [['','All'],['0-6','0–6ft'],['7-20','7–20ft'],['21-99','21+ft']] : [['','All dist'],['0-100','≤100'],['101-150','101–150'],['151-200','151–200'],['201-999','200+']];
   return `<div class="card"><div class="hd"><span class="t">Miss patterns</span><span class="small muted num">${total} shots</span></div><div class="bd">
-    <div class="chips" style="margin-bottom:8px">${kinds.map(k=>`<button class="chip sm ${HM.kind===k[0]?'on':''}" onclick="HM.kind='${k[0]}';HM.band='';render()">${k[1]}</button>`).join('')}
-      ${['5','20','all'].map(sp=>`<button class="chip sm ${HM.span===sp?'on':''}" onclick="HM.span='${sp}';render()">${sp==='all'?'All':'Last '+sp}</button>`).join('')}</div>
+    <div class="chips" style="margin-bottom:8px">${kinds.map(k=>`<button class="chip sm ${HM.kind===k[0]?'on':''}" onclick="HM.kind='${k[0]}';HM.band='';render()">${k[1]}</button>`).join('')}</div>
     ${HM.kind!=='putt'? `<div class="row" style="margin-bottom:8px"><select class="f" style="min-height:42px" onchange="HM.clubId=this.value;render()">${clubOpts}</select></div>`:''}
     <div class="chips" style="margin-bottom:10px">${bands.map(b=>`<button class="chip sm ${HM.band===b[0]?'on':''}" onclick="HM.band='${b[0]}';render()">${b[1]}</button>`).join('')}</div>
     ${padB}
@@ -1249,6 +1573,19 @@ function wedgeMatrixCard(){
   </div></div>`;
 }
 
+/* ---------------- drill library ---------------- */
+const DRILLS = [
+  {cat:'Wedges', name:'Wedge ladder', how:'Pick one wedge. Hit 3 balls each at ½, ¾ and full. Log carries per block — the medians build your wedge matrix. Goal: three distinct, repeatable numbers per wedge.'},
+  {cat:'Wedges', name:'Clock calibration', how:'Hands to 9:00, 10:30, full. Same tempo, same finish. 5 balls per position, one club per session. Chart drift over weeks.'},
+  {cat:'Putting', name:'Gate drill', how:'Two tees a putter-head-width apart, 6 ft from the hole. 10 putts through the gate. Log attempts and makes. Under 7/10 means face control, not read, is the issue.'},
+  {cat:'Putting', name:'Lag ladder 20/30/40', how:'3 balls from 20, 30, 40 ft. Success = inside 3 ft. Log make + inside-3 count per distance. Directly attacks 3-putt rate.'},
+  {cat:'Putting', name:'Around the world', how:'6 balls in a circle 4 ft from the cup. Make all 6 to move to 5 ft, then 6 ft. Log the longest completed circle.'},
+  {cat:'Short game', name:'Up-and-down challenge', how:'9 balls, 9 different lies around a green. Chip + putt out every ball. Score = up-and-downs out of 9. Tour average is about 6.'},
+  {cat:'Bunker', name:'Dollar-bill splash', how:'Draw a dollar-sized box around the ball in the sand. Take the whole box, not the ball. 10 reps focusing on entry point 2 inches behind.'},
+  {cat:'Driver', name:'Fairway windows', how:'Pick two range flags as a fairway. 10 drivers, log hits inside the window and miss side. Feeds the shape heatmap story.'},
+  {cat:'Irons', name:'9-shot flight', how:'One mid-iron. Attempt draw/straight/fade at low/mid/high — all nine flights. Log which cells you can actually produce; the gaps are your recovery limits.'}
+];
+
 /* ============================================================
    PRACTICE TAB
    ============================================================ */
@@ -1262,9 +1599,16 @@ function vPractice(){
       <div class="ti">${esc(p.focus||'Practice')}</div>
       <div class="sub">${fmtDate(p.date)} · ${esc(p.location||'')} · ${nShots} ball shots${nPutt? ' · '+nPutt+' putts':''}</div></div><span class="arr">›</span></div>`;
   }).join('');
+  const cats=[...new Set(DRILLS.map(d=>d.cat))];
   return `<div class="pageTitle"><h1>Practice</h1></div>
     <button class="btn primary wide" onclick="newSession()">＋ New session</button>
     <div style="height:14px"></div>
+    <div class="card"><div class="hd"><span class="t">Drill library</span></div><div class="bd">
+      ${cats.map(cat=>`<div class="small" style="font-weight:800;margin:8px 0 4px;color:var(--turf)">${cat}</div>
+        ${DRILLS.filter(d=>d.cat===cat).map(d=>`<details class="drill"><summary>${esc(d.name)}</summary>
+          <div class="db">${esc(d.how)}
+          <div style="margin-top:8px"><button class="btn sm" onclick="startDrill('${esc(d.name)}')">Start session with this drill</button></div></div></details>`).join('')}`).join('')}
+    </div></div>
     <div class="card"><div class="hd"><span class="t">Sessions</span></div>
     <div class="bd tight">${list||'<div style="padding:14px" class="muted">Log range work, TrackMan numbers, and putting drills here. It all feeds stock yardages and the wedge matrix.</div>'}</div></div>`;
 }
@@ -1302,7 +1646,10 @@ function vSession(id){
     <div><label class="f">Date</label><input class="f num" type="date" value="${p.date}" onchange="prac().date=this.value"></div>
     <div><label class="f">Location</label><input class="f" value="${esc(p.location)}" onchange="prac().location=this.value" placeholder="Range / sim"></div>
   </div>
-  <label class="f">Focus</label><input class="f" value="${esc(p.focus)}" onchange="prac().focus=this.value;save()" placeholder="56° distance control">
+  <label class="f">Focus / drill</label>
+  <input class="f" list="drillList" value="${esc(p.focus)}" onchange="prac().focus=this.value;save();render()" placeholder="56° distance control">
+  <datalist id="drillList">${DRILLS.map(d=>`<option value="${esc(d.name)}">`).join('')}</datalist>
+  ${(()=>{const d=DRILLS.find(x=>x.name===p.focus); return d? `<div class="histLine" style="margin-top:8px">📋 <span class="small">${esc(d.how)}</span></div>`:'';})()}
   <label class="f">Notes</label><textarea class="f" onchange="prac().notes=this.value;save()">${esc(p.notes)}</textarea>
   <div class="sec">Ball flight blocks (TrackMan / launch monitor)</div>
   ${blocks}
@@ -1342,6 +1689,8 @@ function vTips(){
       <span class="row"><button class="btn sm ghost" onclick="togglePin('${t.id}')">${t.pinned?'Unpin':'Pin'}</button>
       <button class="btn sm ghost" onclick="tipEditor('${t.id}')">Edit</button></span></div>
     ${t.body?`<div class="tb">${esc(t.body)}</div>`:''}
+    ${t.photo?`<img src="${t.photo}" alt="">`:''}
+    ${t.url?`<div style="margin-top:6px"><a href="${esc(t.url)}" target="_blank" rel="noopener">🔗 ${esc(t.url.replace(/^https?:\/\//,'').slice(0,42))}</a></div>`:''}
     <div>${(t.tags||[]).map(g=>`<span class="tag">${esc(g)}</span>`).join('')}</div>
   </div>`).join('') || '<p class="muted">Nothing matches.</p>'}`;
 }
@@ -1349,11 +1698,17 @@ function togglePin(id){ const t=S.tips.find(x=>x.id===id);
   if(!t.pinned) S.tips.forEach(x=>x.pinned=false); // one "today's thought" at a time
   t.pinned=!t.pinned; render(); }
 function tipEditor(id){
+  TIPPHOTO=null;
   const t=id? S.tips.find(x=>x.id===id) : {title:'',body:'',tags:[]};
   const sugg=['driver','irons','wedges','chipping','bunker','putting','mental','pre-shot','drill'];
   openSheet(`<div class="sheetHd"><span class="t">${id?'Edit tip':'New tip'}</span><button class="btn sm ghost" onclick="closeSheet()">Cancel</button></div>
     <label class="f">Title</label><input class="f" id="tipT" value="${esc(t.title)}" placeholder="Swing thought…">
     <label class="f">Body</label><textarea class="f" id="tipB">${esc(t.body)}</textarea>
+    <label class="f">Link (optional)</label><input class="f" id="tipU" value="${esc(t.url||'')}" placeholder="https://youtube.com/…">
+    <label class="f">Photo (optional)</label>
+    <div class="row"><button class="btn sm" onclick="$('#tipP').click()">${t.photo?'Replace photo':'＋ Attach photo'}</button>
+      ${t.photo?`<button class="btn sm ghost" onclick="TIPPHOTO='';this.previousElementSibling.textContent='＋ Attach photo';toast('Photo will be removed on save')">Remove</button>`:''}</div>
+    <input type="file" id="tipP" accept="image/*" style="display:none" onchange="tipPhoto(this)">
     <label class="f">Tags (comma separated)</label><input class="f" id="tipG" value="${esc((t.tags||[]).join(', '))}">
     <div class="chips" style="margin-top:8px">${sugg.map(g=>`<button class="chip sm" onclick="tipTagAdd('${g}')">${g}</button>`).join('')}</div>
     <div style="height:12px"></div>
@@ -1362,12 +1717,27 @@ function tipEditor(id){
 }
 function tipTagAdd(g){ const el=$('#tipG'); const cur=el.value.split(',').map(s=>s.trim()).filter(Boolean);
   if(!cur.includes(g))cur.push(g); el.value=cur.join(', '); }
+let TIPPHOTO=null;   // pending compressed photo for the open editor; ''=remove, null=unchanged
+function tipPhoto(inp){
+  const f=inp.files[0]; if(!f) return;
+  const img=new Image(); const rd=new FileReader();
+  rd.onload=()=>{ img.onload=()=>{
+      const max=900, sc=Math.min(1, max/Math.max(img.width,img.height));
+      const cv=document.createElement('canvas'); cv.width=Math.round(img.width*sc); cv.height=Math.round(img.height*sc);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      TIPPHOTO=cv.toDataURL('image/jpeg',0.72);
+      toast('Photo attached ('+Math.round(TIPPHOTO.length/1024)+' KB, stored on-device)');
+    }; img.src=rd.result; };
+  rd.readAsDataURL(f);
+}
 function tipSave(id){
   const title=$('#tipT').value.trim(); if(!title){toast('Give it a title');return;}
   const tags=$('#tipG').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-  if(id){ const t=S.tips.find(x=>x.id===id); t.title=title;t.body=$('#tipB').value;t.tags=tags; }
-  else S.tips.unshift({id:uid(),title,body:$('#tipB').value,tags,pinned:false,created:todayISO()});
-  closeSheet(); render();
+  const url=$('#tipU').value.trim();
+  if(id){ const t=S.tips.find(x=>x.id===id); t.title=title;t.body=$('#tipB').value;t.tags=tags;t.url=url;
+    if(TIPPHOTO!==null) t.photo = TIPPHOTO||undefined; }
+  else S.tips.unshift({id:uid(),title,body:$('#tipB').value,tags,url,photo:TIPPHOTO||undefined,pinned:false,created:todayISO()});
+  TIPPHOTO=null; closeSheet(); render();
 }
 
 /* ============================================================
@@ -1391,18 +1761,33 @@ function vMoreMenu(){
 function backBtn(){ return `<button class="btn sm ghost" onclick="mgo('menu')" style="margin-bottom:10px">‹ More</button>`; }
 
 function vBag(){
-  const rows=[...S.clubs].sort((a,b)=>a.sort-b.sort).map((c,i)=>`<tr>
-    <td><input class="f" style="min-height:40px;width:64px" value="${esc(c.label)}" onchange="c=S.clubs.find(x=>x.id==='${c.id}');c.label=this.value;save()"></td>
-    <td><select class="f" style="min-height:40px" onchange="S.clubs.find(x=>x.id==='${c.id}').type=this.value;save()">
-      ${[['D','Driver'],['W','Wood/Hy'],['I','Iron'],['Wg','Wedge'],['P','Putter']].map(t=>`<option value="${t[0]}" ${c.type===t[0]?'selected':''}>${t[1]}</option>`).join('')}</select></td>
-    <td class="num"><input class="f num" style="min-height:40px;width:70px" inputmode="numeric" value="${c.stock||''}" onchange="S.clubs.find(x=>x.id==='${c.id}').stock=parseInt(this.value)||0;save()"></td>
-    <td><button class="btn sm ghost" onclick="bagMove('${c.id}',-1)">↑</button><button class="btn sm ghost" onclick="bagMove('${c.id}',1)">↓</button>
-        <button class="btn sm ghost" onclick="if(confirm('Remove club?')){S.clubs=S.clubs.filter(x=>x.id!=='${c.id}');render()}">✕</button></td></tr>`).join('');
-  return backBtn()+`<div class="pageTitle"><h1>My bag</h1></div>
-  <div class="card"><div class="bd tight" style="overflow-x:auto"><table class="data">
-    <tr><th>Club</th><th>Type</th><th class="num">Stock yd</th><th></th></tr>${rows}</table></div></div>
-  <button class="btn wide" onclick="S.clubs.push({id:uid(),label:'New',type:'I',stock:150,sort:S.clubs.length});render()">＋ Add club</button>`;
+  const active=[...S.clubs].filter(c=>!c.bench).sort((a,b)=>a.sort-b.sort);
+  const bench=[...S.clubs].filter(c=>c.bench).sort((a,b)=>a.sort-b.sort);
+  const row=(c)=>`<div style="padding:12px 14px;border-bottom:1px solid var(--line)">
+    <div class="row">
+      <input class="f" style="min-height:42px;width:64px;font-weight:800" value="${esc(c.label)}" onchange="cset('${c.id}','label',this.value)">
+      <select class="f grow" style="min-height:42px" onchange="cset('${c.id}','type',this.value)">
+        ${[['D','Driver'],['W','Wood/Hy'],['I','Iron'],['Wg','Wedge'],['P','Putter']].map(t=>`<option value="${t[0]}" ${c.type===t[0]?'selected':''}>${t[1]}</option>`).join('')}</select>
+      <input class="f num" style="min-height:42px;width:70px" inputmode="numeric" value="${c.stock||''}" placeholder="yds" onchange="cset('${c.id}','stock',parseInt(this.value)||0)">
+    </div>
+    <div class="row" style="margin-top:7px">
+      <input class="f grow" style="min-height:40px" value="${esc(c.brand||'')}" placeholder="Brand (Titleist…)" onchange="cset('${c.id}','brand',this.value)">
+      <input class="f grow" style="min-height:40px" value="${esc(c.model||'')}" placeholder="Model (T150…)" onchange="cset('${c.id}','model',this.value)">
+    </div>
+    <div class="row" style="margin-top:7px;justify-content:flex-end;gap:6px">
+      <button class="btn sm ghost" onclick="bagMove('${c.id}',-1)">↑</button>
+      <button class="btn sm ghost" onclick="bagMove('${c.id}',1)">↓</button>
+      <button class="btn sm ${c.bench?'':'ghost'}" onclick="cset('${c.id}','bench',${c.bench?'false':'true'})">${c.bench?'⬆ Reactivate':'🪑 Bench'}</button>
+      <button class="btn sm ghost" onclick="if(confirm('Remove club and its history link?')){S.clubs=S.clubs.filter(x=>x.id!=='${c.id}');render()}">✕</button>
+    </div>
+  </div>`;
+  return backBtn()+`<div class="pageTitle"><h1>My bag</h1><span class="eyebrow num">${active.length} clubs</span></div>
+  <div class="card"><div class="hd"><span class="t">In the bag</span></div><div class="bd tight">${active.map(row).join('')}</div></div>
+  ${bench.length? `<div class="card"><div class="hd"><span class="t">Bench / archived</span></div><div class="bd tight">${bench.map(row).join('')}</div>
+    <div class="small muted" style="padding:8px 14px">Benched clubs keep their shot history in stats but never show in the picker.</div></div>`:''}
+  <button class="btn wide" onclick="S.clubs.push({id:uid(),label:'New',type:'I',stock:150,sort:S.clubs.length,brand:'',model:'',bench:false});render()">＋ Add club</button>`;
 }
+function cset(id,k,v){ const c=S.clubs.find(x=>x.id===id); c[k]= typeof v==='string'? v : v; if(v==='true')c[k]=true; if(v==='false')c[k]=false; save(); if(k==='bench')render(); }
 function bagMove(id,d){ const a=[...S.clubs].sort((x,y)=>x.sort-y.sort); const i=a.findIndex(x=>x.id===id); const j=i+d;
   if(j<0||j>=a.length)return; [a[i].sort,a[j].sort]=[a[j].sort,a[i].sort]; render(); }
 
@@ -1425,6 +1810,15 @@ function vSettings(){
     ${setting('Show word labels on numpads','Turn off for bare digits once the grids are memorized.','showLabels')}
     ${setting('High-visibility outdoor theme','Pure black on white, bigger targets. For bright sun and gloves.','hiVis')}
     ${setting('Green digit always relative to pin','Even on missed greens the digit reads position vs. the pin; GIR is its own flag.','greenRelPin')}
+    <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)">
+      <div class="grow"><div style="font-weight:700">Default entry style</div><div class="small muted">Shot-by-shot builds heatmaps and yardages; Quick score is 18Birdies-style per-hole entry. Switchable mid-round.</div></div>
+      <div class="segs" style="flex:0 0 170px">
+        <button ${S.settings.defaultMode!=='basic'?'class="on"':''} onclick="S.settings.defaultMode='advanced';render()">Shots</button>
+        <button ${S.settings.defaultMode==='basic'?'class="on"':''} onclick="S.settings.defaultMode='basic';render()">Quick</button></div>
+    </div>
+    <label class="f">golfcourseapi.com key (optional)</label>
+    <input class="f" value="${esc(S.settings.gcApiKey||'')}" placeholder="Paste API key for online course lookup" onchange="S.settings.gcApiKey=this.value.trim();save();render()">
+    <div class="small muted" style="margin-top:6px">Free key at golfcourseapi.com — fills rating, slope, address and all 18 holes when you add a course. Everything still works offline without it.</div>
   </div></div>
   <div class="card"><div class="hd"><span class="t">TrackMan columns</span></div><div class="bd"><div class="chips">${tmChecks}</div></div></div>`;
 }
@@ -1439,14 +1833,26 @@ function tmToggle(k){ const a=S.settings.tmCols; const i=a.indexOf(k); if(i>=0)a
 function vQuips(){
   return backBtn()+`<div class="pageTitle"><h1>Golf-isms</h1></div>
   <button class="btn wide" onclick="quipAdd()">＋ Add one</button><div style="height:14px"></div>
-  ${S.quips.map(q=>`<blockquote class="quip">“${esc(q.text)}”${q.by?`<span class="by">— ${esc(q.by)}</span>`:''}
-    <span class="by"><a href="#" onclick="S.quips=S.quips.filter(x=>x.id!=='${q.id}');render();return false" style="color:var(--ink2)">remove</a></span></blockquote>`).join('')}`;
+  ${S.quips.map(q=>`<blockquote class="quip">“${esc(q.text)}”
+    ${q.by?`<span class="by">— ${esc(q.by)}</span>`:''}
+    ${q.context?`<span class="by" style="font-style:italic">${esc(q.context)}</span>`:''}
+    <span class="by"><a href="#" onclick="quipEdit('${q.id}');return false" style="color:var(--turf)">edit</a> · <a href="#" onclick="S.quips=S.quips.filter(x=>x.id!=='${q.id}');render();return false" style="color:var(--ink2)">remove</a></span></blockquote>`).join('')}`;
 }
-function quipAdd(){
-  openSheet(`<div class="sheetHd"><span class="t">New golf-ism</span><button class="btn sm ghost" onclick="closeSheet()">Cancel</button></div>
-    <label class="f">The line / story</label><textarea class="f" id="qT"></textarea>
-    <label class="f">Attribution (optional)</label><input class="f" id="qB">
-    <div style="height:10px"></div><button class="btn primary wide" onclick="if($('#qT').value.trim()){S.quips.unshift({id:uid(),text:$('#qT').value.trim(),by:$('#qB').value.trim()});closeSheet();render()}">Save</button>`);
+function quipAdd(){ quipEdit(null); }
+function quipEdit(id){
+  const q = id? S.quips.find(x=>x.id===id) : {text:'',by:'',context:''};
+  openSheet(`<div class="sheetHd"><span class="t">${id?'Edit':'New'} golf-ism</span><button class="btn sm ghost" onclick="closeSheet()">Cancel</button></div>
+    <label class="f">The line / story</label><textarea class="f" id="qT">${esc(q.text)}</textarea>
+    <label class="f">Who said it</label><input class="f" id="qB" value="${esc(q.by||'')}" placeholder="Uncle Jerry, Lee Trevino…">
+    <label class="f">In reference to what</label><input class="f" id="qC" value="${esc(q.context||'')}" placeholder="After the triple on 14 at Willis Case, 2024">
+    <div style="height:10px"></div>
+    <button class="btn primary wide" onclick="quipSave('${id||''}')">Save</button>`);
+}
+function quipSave(id){
+  const t=$('#qT').value.trim(); if(!t){toast('Write the line first');return;}
+  if(id){ const q=S.quips.find(x=>x.id===id); q.text=t; q.by=$('#qB').value.trim(); q.context=$('#qC').value.trim(); }
+  else S.quips.unshift({id:uid(), text:t, by:$('#qB').value.trim(), context:$('#qC').value.trim()});
+  closeSheet(); render();
 }
 
 /* ============================================================
@@ -1626,7 +2032,7 @@ function toast(msg){
 }
 document.addEventListener('DOMContentLoaded',()=>{
   $('#sheetWrap').addEventListener('click',e=>{ if(e.target.id==='sheetWrap') closeSheet(); });
-  if(S.activeRoundId && activeRound()) { TAB='play'; PLAYVIEW='hole'; }   // fast resume
+  if(S.activeRoundId && activeRound()) { TAB='play'; PLAYVIEW='home'; }  // land on the round summary; Resume is one tap
   render();
 });
 window.addEventListener('pagehide', save);
@@ -1641,9 +2047,12 @@ try{
     TIPQ:{get:()=>TIPQ,set:v=>{TIPQ=v}}, TIPTAG:{get:()=>TIPTAG,set:v=>{TIPTAG=v}},
     PLAYVIEW:{get:()=>PLAYVIEW,set:v=>{PLAYVIEW=v}}, VIEWROUND:{get:()=>VIEWROUND,set:v=>{VIEWROUND=v}},
     PRACVIEW:{get:()=>PRACVIEW,set:v=>{PRACVIEW=v}}, MOREVIEW:{get:()=>MOREVIEW,set:v=>{MOREVIEW=v}},
-    TAB:{get:()=>TAB,set:v=>{TAB=v}}
+    TAB:{get:()=>TAB,set:v=>{TAB=v}}, CID:{get:()=>typeof CID!=='undefined'?CID:null,set:v=>{try{CID=v}catch(e){}}}, STATF:{get:()=>STATF,set:v=>{STATF=v}}
   });
 }catch(e){}
+
+function startDrill(name){ const p={id:uid(),date:todayISO(),location:'',focus:name,notes:'',blocks:[],putting:[]};
+  S.practice.push(p); PRACVIEW=p.id; render(); }
 </script>
 </body>
 </html>
