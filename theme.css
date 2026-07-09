@@ -1,0 +1,50 @@
+/* ============================================================
+   THEME TOKENS — every knob in one place
+   ============================================================
+   Change values here (or override from src/js/theme.js) and the
+   whole app follows. Nothing in app.css hardcodes a color.
+   ============================================================ */
+:root{
+  /* ---- surfaces ---- */
+  --paper:#F4F5F2;        /* app background */
+  --card:#FFFFFF;         /* card / sheet / input surfaces */
+  --line:#E3E5E1;         /* hairline borders and dividers */
+
+  /* ---- text ---- */
+  --ink:#171B1E;          /* primary text */
+  --ink2:#61686E;         /* secondary / muted text */
+
+  /* ---- brand ---- */
+  --turf:#1B6B41;         /* primary green: links, accents, selected pads */
+  --turf-deep:#0F4A2C;    /* darker green: primary buttons, hero card */
+  --turf-soft:#E4F1E9;    /* green tint: good-stat pills, lie badges */
+  --flag:#D93A2B;         /* THE accent: the "5 = pure" cell, alerts */
+  --flag-soft:#FCEAE7;    /* red tint: bad-stat pills, danger buttons */
+  --sand:#F3ECD9;         /* warm tint: banners, warnings */
+  --amber:#A8770E;        /* warm text on sand */
+  --sky:#EAF2F8;          /* cool tint: hole-history line */
+
+  /* ---- shape & size ---- */
+  --r:16px;               /* large radius: cards, sheets, hero */
+  --rs:11px;              /* small radius: inputs, banners */
+  --tap:52px;             /* minimum touch target (buttons) */
+  --sh:0 1px 2px rgba(23,27,30,.06),0 4px 14px rgba(23,27,30,.06); /* card shadow */
+
+  /* ---- type ---- */
+  /* System stacks only — no webfonts, so offline needs zero requests. */
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace; /* ALL numbers */
+  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ============================================================
+   HIGH-VISIBILITY THEME — Settings → outdoor theme
+   Pure black-on-white, thicker borders, bigger targets.
+   Add alternate themes the same way: a body class that
+   re-declares tokens. Toggle it from render().
+   ============================================================ */
+/* high visibility */
+body.hivis{--paper:#FFFFFF;--card:#FFFFFF;--ink:#000;--ink2:#333;--line:#8F8F8F;
+  --turf:#0B4A28;--turf-deep:#07351C;--flag:#C40000;--tap:60px;--sh:none;font-size:17px}
+body.hivis .pad button{min-height:64px;border-width:2.5px}
+body.hivis .btn{border-width:2.5px}
+body.hivis .card{border-width:2px}
