@@ -11,15 +11,67 @@
 <meta name="theme-color" content="#185C37">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23185C37'/%3E%3Ccircle cx='90' cy='90' r='34' fill='%23FBFAF6'/%3E%3Ccircle cx='90' cy='90' r='9' fill='%23D22E2E'/%3E%3C/svg%3E">
 <style>
+/* ═══ src/css/theme.css ═══ */
+/* ============================================================
+   THEME TOKENS — every knob in one place
+   ============================================================
+   Change values here (or override from src/js/theme.js) and the
+   whole app follows. Nothing in app.css hardcodes a color.
+   ============================================================ */
 :root{
-  --paper:#F4F5F2; --card:#FFFFFF; --ink:#171B1E; --ink2:#61686E; --line:#E3E5E1;
-  --turf:#1B6B41; --turf-deep:#0F4A2C; --turf-soft:#E4F1E9; --flag:#D93A2B; --flag-soft:#FCEAE7;
-  --sand:#F3ECD9; --amber:#A8770E; --sky:#EAF2F8;
-  --r:16px; --rs:11px; --tap:52px;
-  --sh:0 1px 2px rgba(23,27,30,.06),0 4px 14px rgba(23,27,30,.06);
-  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  /* ---- surfaces ---- */
+  --paper:#F4F5F2;        /* app background */
+  --card:#FFFFFF;         /* card / sheet / input surfaces */
+  --line:#E3E5E1;         /* hairline borders and dividers */
+
+  /* ---- text ---- */
+  --ink:#171B1E;          /* primary text */
+  --ink2:#61686E;         /* secondary / muted text */
+
+  /* ---- brand ---- */
+  --turf:#1B6B41;         /* primary green: links, accents, selected pads */
+  --turf-deep:#0F4A2C;    /* darker green: primary buttons, hero card */
+  --turf-soft:#E4F1E9;    /* green tint: good-stat pills, lie badges */
+  --flag:#D93A2B;         /* THE accent: the "5 = pure" cell, alerts */
+  --flag-soft:#FCEAE7;    /* red tint: bad-stat pills, danger buttons */
+  --sand:#F3ECD9;         /* warm tint: banners, warnings */
+  --amber:#A8770E;        /* warm text on sand */
+  --sky:#EAF2F8;          /* cool tint: hole-history line */
+
+  /* ---- shape & size ---- */
+  --r:16px;               /* large radius: cards, sheets, hero */
+  --rs:11px;              /* small radius: inputs, banners */
+  --tap:52px;             /* minimum touch target (buttons) */
+  --sh:0 1px 2px rgba(23,27,30,.06),0 4px 14px rgba(23,27,30,.06); /* card shadow */
+
+  /* ---- type ---- */
+  /* System stacks only — no webfonts, so offline needs zero requests. */
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace; /* ALL numbers */
   --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
+
+/* ============================================================
+   HIGH-VISIBILITY THEME — Settings → outdoor theme
+   Pure black-on-white, thicker borders, bigger targets.
+   Add alternate themes the same way: a body class that
+   re-declares tokens. Toggle it from render().
+   ============================================================ */
+/* high visibility */
+body.hivis{--paper:#FFFFFF;--card:#FFFFFF;--ink:#000;--ink2:#333;--line:#8F8F8F;
+  --turf:#0B4A28;--turf-deep:#07351C;--flag:#C40000;--tap:60px;--sh:none;font-size:17px}
+body.hivis .pad button{min-height:64px;border-width:2.5px}
+body.hivis .btn{border-width:2.5px}
+body.hivis .card{border-width:2px}
+
+/* ═══ src/css/app.css ═══ */
+/* ============================================================
+   APP STYLES — layout + components (tokens live in theme.css)
+   ============================================================
+   Sections below in order: reset/shell, nav, cards, buttons &
+   chips, forms, the 3×3 numpad (entry + heatmap variants),
+   shot rows, hole header, overview grid, bottom sheet, keypad,
+   course grid, tables, tips & drills, misc, responsive.
+   ============================================================ */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{font-family:var(--ui);background:var(--paper);color:var(--ink);font-size:16px;
@@ -231,12 +283,6 @@ details.drill .db{padding:0 15px 13px;font-size:14.5px;line-height:1.5;white-spa
 .insight:last-child{border-bottom:0}
 .insight .ii{font-size:17px}
 
-/* high visibility */
-body.hivis{--paper:#FFFFFF;--card:#FFFFFF;--ink:#000;--ink2:#333;--line:#8F8F8F;
-  --turf:#0B4A28;--turf-deep:#07351C;--flag:#C40000;--tap:60px;--sh:none;font-size:17px}
-body.hivis .pad button{min-height:64px;border-width:2.5px}
-body.hivis .btn{border-width:2.5px}
-body.hivis .card{border-width:2px}
 @media (max-width:380px){ .ovGrid{grid-template-columns:repeat(6,1fr)} }
 
 /* segmented controls used across play + start sheet */
@@ -262,40 +308,133 @@ body.hivis .card{border-width:2px}
 <nav id="nav"></nav>
 <div id="sheetWrap"><div id="sheet"></div></div>
 <script>
+/* ═══════════════ src/js/01-core.js ═══════════════ */
 'use strict';
 /* ============================================================
    CADDIE BOOK — personal golf scoring, data & practice
-   Single-user, offline-first. All data lives in localStorage
-   under one key, mirrored to an in-memory fallback.
+   ============================================================
+   Single-user, offline-first. One HTML file at runtime; this
+   modular source tree is assembled by build.js (see the
+   manifest there for load order — it matters, later modules
+   call things defined in earlier ones).
+
+   MODULE MAP
+   ----------
+   01-core        storage primitives + tiny utilities (this file)
+   02-store       the state object S: schema, seeds, load/save
+   03-notation    the 1-9 notation system constants
+   04-engine      per-hole and per-round derivation
+   05-handicap    WHS handicap math + stat filters
+   theme          THEME override object (restyle in one place)
+   components     ui.* reusable HTML builders
+   06-router      bottom nav registry + render()
+   07-play-home   Play hub, history, course pages
+   08-course-editor  manual grid, paste parser, online lookup
+   09-hole        the on-course hole screen (Shots + Quick modes)
+   10-shot-sheet  the tap-first shot entry sheet
+   11-round-views overview grid, finish, past-round detail
+   12-stats       stats dashboard, heatmaps, yardages, insights
+   13-practice    drill library + sessions + TrackMan logging
+   14-tips        tips/swing-thought library
+   15-more        bag, courses list, settings, golf-isms
+   16-data        JSON backup, CSV, AI text, 18Birdies import
+   17-init        sheet/toast plumbing, boot, console bridge
    ============================================================ */
 
+/* ---------- persistence primitives ----------
+   Everything lives under ONE localStorage key as a JSON blob.
+   If localStorage is unavailable (private mode edge cases) we
+   fall back to memory and render() shows a warning banner. */
 const DBKEY = 'caddiebook_v1';
-let MEMSTORE = null;
-let STORAGE_OK = true;
+let MEMSTORE = null;       // in-memory fallback when localStorage fails
+let STORAGE_OK = true;     // flips false on the first storage error
 
+/** Read the raw JSON blob (or null on first run). */
 function storeGet(){
   try { return localStorage.getItem(DBKEY); }
   catch(e){ STORAGE_OK = false; return MEMSTORE; }
 }
+/** Write the raw JSON blob; always mirrors to memory first so a
+ *  storage failure never loses the in-session state. */
 function storeSet(v){
   MEMSTORE = v;
   try { localStorage.setItem(DBKEY, v); }
   catch(e){ STORAGE_OK = false; }
 }
+
+/* ---------- tiny utilities used everywhere ---------- */
+/** Unique-enough id: time base36 + 6 random chars. */
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+/** HTML-escape user text before interpolation into templates. */
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+/** querySelector shorthand. */
 const $ = s => document.querySelector(s);
+/** Local date as YYYY-MM-DD (round dates, backups). */
 function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+/** YYYY-MM-DD → M/D/YY for display. */
 function fmtDate(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${m}/${d}/${String(y).slice(2)}`; }
+
+/* ---------- small stats helpers ---------- */
+/** Median of a numeric array (null if empty). */
 function median(a){ if(!a.length) return null; const s=[...a].sort((x,y)=>x-y); const m=Math.floor(s.length/2); return s.length%2? s[m] : (s[m-1]+s[m])/2; }
+/** Linear-interpolated quantile, q in [0,1]. */
 function quantile(a,q){ if(!a.length) return null; const s=[...a].sort((x,y)=>x-y); const p=(s.length-1)*q; const b=Math.floor(p); return s[b] + (s[Math.min(b+1,s.length-1)]-s[b])*(p-b); }
+/** Arithmetic mean (null if empty). */
 function mean(a){ return a.length? a.reduce((x,y)=>x+y,0)/a.length : null; }
+/** Sample standard deviation (null if n<2). */
 function sd(a){ if(a.length<2) return null; const m=mean(a); return Math.sqrt(a.reduce((s,x)=>s+(x-m)*(x-m),0)/(a.length-1)); }
+/** Format helpers: one decimal / whole number / percentage, all '–' safe. */
 function r1(x){ return x==null? '–' : (Math.round(x*10)/10).toFixed(1); }
 function r0(x){ return x==null? '–' : String(Math.round(x)); }
 function pct(n,d){ return d? Math.round(100*n/d)+'%' : '–'; }
 
-/* ---------------- default state / seed ---------------- */
+/* ═══════════════ src/js/02-store.js ═══════════════ */
+/* ============================================================
+   STATE — the single source of truth (schema + seeds)
+   ============================================================
+   The whole app is one plain object `S`, autosaved as JSON on
+   every render(). It intentionally mirrors a relational schema
+   so the JSON backup maps table-for-table into MySQL.
+
+   SCHEMA (JSON path → relational table)
+   -------------------------------------
+   S.settings                 app preferences (see defaultState)
+   S.clubs[]                  club:   {id,label,type,stock,sort,brand,model,bench}
+                              type: D driver | W wood/hybrid | I iron | Wg wedge | P putter
+                              bench:true hides from pickers, keeps history
+   S.courses[]                course: {id,name,info:{address,city,state},tees[]}
+   S.courses[].tees[]         tee:    {id,name,rating,slope,holes[]}
+   ...tees[].holes[]          hole_template: {n,par,ydg,si}
+   S.rounds[]                 round:  {id,courseId,teeId,date,weather,notes,
+                                       finished,curHole,span:'18'|'F9'|'B9',
+                                       mode:'advanced'|'basic',
+                                       ctx:{partners,drinks,vibe}, holes[]}
+       legacy import rounds instead carry: {legacy:true,source,srcId,agg{…}}
+   S.rounds[].holes[]         hole_play: {n,par,ydg,si,windD,windS,pen,shots[],ov{}}
+                              ov{} = per-hole overrides AND the Quick-mode store:
+                                     score, putts, fir, gir, girPad, firstPuttFt,
+                                     sand, pen, udA, udM
+   ...holes[].shots[]         shot:  {id,clubId,lie,dist,unit:'y'|'f',
+                                      fType:'lat'|'green'|'putt',lat,pad,
+                                      shape,effort,frac,strike,note}
+   S.tips[]                   tip:   {id,title,body,tags[],url,photo,pinned,created}
+   S.quips[]                  golfism: {id,text,by,context}
+   S.practice[]               practice_session: {id,date,location,focus,notes,
+                                                 blocks[],putting[]}
+   ...blocks[]                {id,clubId,frac,shots:[{carry,total,bs,cs,sm,la,
+                                spin,axis,apex,side,sideT,aa,path,face}]}
+   ...putting[]               {dist,att,made}
+
+   MIGRATION RULE: loadState() merges saved settings over the
+   defaults and backfills any missing top-level arrays, so adding
+   a new field here is always safe for existing users — give it a
+   default and old saves pick it up on next load.
+
+   EXTENSION POINT: new persistent feature? Add its array/object
+   to defaultState(), list it in loadState()'s backfill loop, and
+   it is automatically saved, restored, and included in backups.
+   ============================================================ */
+/** Seed bag matching the player's actual set. Edited freely in More → My bag. */
 function defaultBag(){
   const rows = [
     ['Dr','D',270],['3w','W',240],['5i','I',190],['6i','I',178],['7i','I',166],
@@ -303,6 +442,7 @@ function defaultBag(){
   ];
   return rows.map((r,i)=>({id:uid()+i, label:r[0], type:r[1], stock:r[2], sort:i, brand:'', model:'', bench:false}));
 }
+/** A few starter tips so the Tips tab demonstrates itself. */
 function seedTips(){
   return [
     {id:uid()+'t1', title:'Wedge clock system', body:'½ = hands to 9 o’clock, ¾ = 10:30, full = normal. Same tempo for all three. Log carry for each and trust the matrix, not the feel of the day.', tags:['wedges','pre-shot'], pinned:true, created:todayISO()},
@@ -310,6 +450,7 @@ function seedTips(){
     {id:uid()+'t3', title:'Bunker: hit the sand, not the ball', body:'Pick a spot 2 inches behind the ball and splash the sand out. Speed is your friend. Finish the swing.', tags:['bunker'], pinned:false, created:todayISO()}
   ];
 }
+/** Starter golf-isms; fully editable in More → Golf-isms. */
 function seedQuips(){
   return [
     {id:uid()+'q1', text:'Drive for show, putt for dough.', by:'Old saying'},
@@ -318,6 +459,7 @@ function seedQuips(){
     {id:uid()+'q4', text:'Nobody has ever regretted taking one more club.', by:''}
   ];
 }
+/** Everything a fresh install starts with. THE schema reference. */
 function defaultState(){
   return {
     ver:1,
@@ -339,6 +481,7 @@ function defaultState(){
     practice: []              // sessions
   };
 }
+/** Parse the saved blob, merge over defaults (see MIGRATION RULE above). */
 function loadState(){
   const raw = storeGet();
   if(!raw) return defaultState();
@@ -351,9 +494,24 @@ function loadState(){
   }catch(e){ return defaultState(); }
 }
 let S = loadState();
+/** Persist S. Called by render() after every interaction — autosave is structural. */
 function save(){ storeSet(JSON.stringify(S)); }
 
-/* ---------------- constants: notation system ---------------- */
+
+/* ═══════════════ src/js/03-notation.js ═══════════════ */
+/* ============================================================
+   NOTATION SYSTEM — the conceptual core
+   ============================================================
+   One rule governs every 3×3 pad: 5 is pure, the ring is the
+   miss, horizontal = left/right, vertical = more/less.
+   Digits are stored raw (1-9); which pad they came from is
+   carried separately (shot.fType / shot.shape), so a green-4,
+   putt-4 and shape-4 can never be confused in analysis.
+
+   EXTENSION POINT: a new lie code, strike tag, wind direction
+   or TrackMan metric is one row in the arrays below — pickers,
+   exports and stats all read from here.
+   ============================================================ */
 const LIES = [['T','Tee'],['FW','Fairway'],['RF','Rough'],['FR','Fringe'],['SD','Sand'],['GR','Green'],['RC','Recovery'],['HZ','Drop']];
 const LIE_NAME = Object.fromEntries(LIES);
 const LATS = ['LL','L','C','R','RR'];
@@ -368,6 +526,8 @@ const PAD_AXES = {
   green:['LONG ↑','SHORT ↓'], putt:['LONG ↑','SHORT ↓'], shape:['DRAW ↑','FADE ↓']
 };
 // display order top→bottom for the standard orientation (top = long / draw)
+/** Row order for rendering a pad top→bottom; the shape pad can flip via settings
+ *  (display only — digit meaning never changes). */
 function padRows(kind){
   let rows = [[7,8,9],[4,5,6],[1,2,3]];
   if(kind==='shape' && !S.settings.shapeTopDraw) rows = [[1,2,3],[4,5,6],[7,8,9]];
@@ -386,10 +546,15 @@ const TM_METRICS = [
 ];
 
 /* ---------------- club helpers ---------------- */
+/** Look up a club object by id (undefined if deleted). */
 function club(id){ return S.clubs.find(c=>c.id===id); }
+/** Display label for a club id; '?' survives deleted clubs in old rounds. */
 function clubLabel(id){ const c=club(id); return c? c.label : '?'; }
+/** The active putter (falls back to a benched one so putts never lose a club). */
 function putterId(){ const c=S.clubs.find(c=>c.type==='P'&&!c.bench)||S.clubs.find(c=>c.type==='P'); return c? c.id : null; }
+/** Clubs shown in pickers: benched ones are hidden but keep their history. */
 function activeClubs(){ return [...S.clubs].filter(c=>!c.bench).sort((a,b)=>a.sort-b.sort); }
+/** Closest active club to a target distance — powers the highlighted suggestion. */
 function suggestClub(dist){
   if(!dist) return null;
   let best=null, bd=1e9;
@@ -398,10 +563,37 @@ function suggestClub(dist){
   return best? best.id : null;
 }
 
+/* ═══════════════ src/js/04-engine.js ═══════════════ */
+
 /* ============================================================
-   DERIVATION ENGINE — everything auto-computed from shot list,
-   any field overridable per hole via h.ov
+   DERIVATION ENGINE
+   ============================================================
+   Nothing about a hole is stored twice: score, putts, FIR, GIR,
+   penalties, scrambling, sand saves and 3-putts are all DERIVED
+   from the shot list on demand. Two escape hatches:
+
+     h.ov{}     per-hole overrides — any derived field the player
+                taps to correct wins over derivation. Quick-score
+                mode writes ONLY into ov (no shots at all).
+     h.basic{}  reserved (see deriveBasicHole) for a fully
+                separate quick store if ov ever gets crowded.
+
+   deriveHole(h) returns:
+     {score, putts, fir:'Y'|'N'|'-', gir:'Y'|'N', pen, threePutt,
+      udA, udM,              // scramble attempted / made
+      sand, sandA, sandM,    // sand shot count / save attempt / made
+      firstPuttFt, firstPuttMade, toPar}
+
+   RULES ENCODED (change here, changes everywhere):
+     FIR   par 3 → '-' ; tee shot lateral 'C' → Y ; green attempt
+           from the tee → '-' (fairway irrelevant)
+     GIR   strokes to reach the green (shots before first putt
+           + penalties) ≤ par−2 ; hole-outs count if ≤ par−2
+     U&D   attempt = every missed GIR ; made = par or better
+     SAND  save attempt = greenside sand (≤50y or no distance)
+           on a missed GIR ; made = par or better
    ============================================================ */
+/** The first shot taken from the green — its distance IS first-putt distance. */
 function firstPuttShot(h){
   return (h.shots||[]).find(s=>s.lie==='GR') || null;
 }
@@ -458,6 +650,9 @@ function deriveHole(h){
           firstPuttFt: fpFt, firstPuttMade: fpMade,
           toPar: score!=null? score-h.par : null};
 }
+/** Sum a round: totals, nine splits, and rate-stat numerators/denominators.
+ *  Returns {perHole[], played, score, par, toPar, putts, pen, f9, b9,
+ *  firY, firD, girY, girD, tp, udA, udM, sA, sM}. Legacy rounds branch. */
 function deriveRound(r){
   if(r.legacy) return deriveLegacyRound(r);
   const holes = r.holes||[];
@@ -494,20 +689,34 @@ function deriveLegacyRound(r){
     eagles:a.eagles||0, birdies:a.birdies||0, pars:a.pars||0, bogeys:a.bogeys||0, dblOrWorse:a.dblOrWorse||0};
 }
 
+/* ═══════════════ src/js/05-handicap.js ═══════════════ */
+
 /* ============================================================
-   HANDICAP (WHS-style)
-   Differential = 113/slope × (AGS − rating)
-   Index = per-count table over most recent 20 rounds
+   HANDICAP (WHS-style) + GLOBAL STAT FILTERS
+   ============================================================
+   Differential = 113 / slope × (adjusted gross − rating)
+   Adjusted gross applies net double bogey per hole once an
+   index exists (par+5 before that); unplayed holes score net
+   par. Index = the standard best-8-of-20 table with the WHS
+   reduced-count schedule under 20 rounds.
+
+   DELIBERATE LIMITS (documented, not bugs):
+   - 9-hole rounds produce NO differential (needs 9-hole ratings)
+   - legacy 18Birdies imports produce NO differential (no tee)
+   - the 54.0 cap and exceptional-score reductions aren't modeled
    ============================================================ */
+/** WHS course handicap = index × slope/113 + (rating − par). */
 function courseHandicap(index, slope, rating, parTotal){
   if(index==null||!slope) return null;
   return Math.round(index * (slope/113) + ((rating||parTotal) - parTotal));
 }
+/** Handicap strokes received on a hole given course handicap + stroke index. */
 function strokesOnHole(ch, si){
   if(ch==null||!si) return 0;
   if(ch<=0) return 0;
   return Math.floor(ch/18) + (si <= (ch%18) ? 1 : 0);
 }
+/** Net-double-bogey-capped gross for differential math; unplayed holes = net par. */
 function adjustedGross(r, indexBefore){
   const tee = teeOf(r);
   const parTotal = r.holes.reduce((s,h)=>s+h.par,0);
@@ -521,6 +730,7 @@ function adjustedGross(r, indexBefore){
   }
   return {ags, complete};
 }
+/** One round → one differential (or null; see DELIBERATE LIMITS above). */
 function scoreDifferential(r, indexBefore){
   if(!is18(r)) return null;                     // 9-hole differentials need 9-hole ratings we don't store
   const tee = teeOf(r);
@@ -528,6 +738,7 @@ function scoreDifferential(r, indexBefore){
   const {ags} = adjustedGross(r, indexBefore);
   return Math.round((113/tee.slope) * (ags - tee.rating) * 10)/10;
 }
+/** WHS index from a window of ≤20 differentials (reduced-count table under 20). */
 function handicapIndexFrom(diffs){
   const n = diffs.length;
   if(n<3) return null;
@@ -547,14 +758,17 @@ function handicapIndexFrom(diffs){
   else           idx=avg(1)-2.0; // n===3
   return Math.round(idx*10)/10;
 }
+/** '18' | 'F9' | 'B9' — with a length fallback for rounds saved before spans. */
 function roundSpan(r){
   if(r.span) return r.span;                     // '18' | 'F9' | 'B9'
   return (r.holes||[]).length<=10 ? 'F9' : '18';
 }
+/** Convenience: does this round count as a full 18? */
 function is18(r){ return roundSpan(r)==='18'; }
 
 /* global stats filter, applied across the Stats tab */
 let STATF = {time:'all', courseId:''};          // time: all | ytd | l90 | l5
+/** finishedRounds() narrowed by the STATF chips (time window + course). */
 function filteredRounds(){
   let rs = finishedRounds();
   if(STATF.courseId) rs = rs.filter(r=>r.courseId===STATF.courseId);
@@ -564,9 +778,12 @@ function filteredRounds(){
   return rs;
 }
 
+/** All completed rounds, oldest first — the canonical stats input. */
 function finishedRounds(){
   return S.rounds.filter(r=>r.finished).sort((a,b)=> (a.date+a.id) < (b.date+b.id) ? -1:1);
 }
+/** Walk rounds chronologically computing each differential with the index
+ *  known at the time (stamps r._diff), returning [{round,diff,index}]. */
 function handicapTimeline(){
   const rs = finishedRounds();
   const out=[]; let idx=null;
@@ -581,6 +798,7 @@ function handicapTimeline(){
   });
   return out;
 }
+/** Latest computed handicap index, or null before 3 rated rounds. */
 function currentIndex(){
   const t=handicapTimeline();
   for(let i=t.length-1;i>=0;i--) if(t[i].index!=null) return t[i].index;
@@ -588,31 +806,186 @@ function currentIndex(){
 }
 
 /* ---------------- course helpers ---------------- */
+/** The course a round was played at (undefined if course deleted). */
 function courseOf(r){ return S.courses.find(c=>c.id===r.courseId); }
+/** The tee a round was played from. */
 function teeOf(r){ const c=courseOf(r); return c? (c.tees||[]).find(t=>t.id===r.teeId) : null; }
+
+
+/* ═══════════════ src/js/theme.js ═══════════════ */
 /* ============================================================
-   RENDER ROOT + NAV
+   THEME — single place to restyle the whole app
+   ============================================================
+   Every color, radius, shadow and font in the app is a CSS
+   custom property (see src/css/theme.css for the defaults).
+   The THEME object below is an OVERRIDE LAYER applied at boot:
+   put any subset of those variables here and they win, without
+   ever touching the CSS.
+
+   HOW TO USE
+   ----------
+   1. Change a color everywhere:      THEME['--turf'] = '#0E5A8A';
+   2. Rounder buttons everywhere:     THEME['--r'] = '22px';
+   3. Different number font:          THEME['--mono'] = 'Menlo, monospace';
+   Then rebuild (node build.js) or just edit + refresh if testing.
+
+   The full list of themeable variables lives at the top of
+   src/css/theme.css, grouped and commented.
+
+   EXTENSION POINT: add your own variables here AND reference
+   them in CSS as var(--your-name) — applyTheme() injects every
+   key in this object, known or new.
+   ============================================================ */
+const THEME = {
+  // Examples (commented out = CSS defaults apply):
+  // '--turf':      '#1B6B41',   // primary green
+  // '--flag':      '#D93A2B',   // the "5 = pure" accent red
+  // '--r':         '16px',      // large corner radius (cards, sheets)
+  // '--tap':       '52px',      // minimum touch-target height
+};
+
+/** Push every THEME override onto <html> as an inline CSS variable.
+ *  Called once at boot (see init module). Safe to call again at
+ *  runtime if you ever build a live theme editor. */
+function applyTheme(){
+  const root = document.documentElement;
+  for(const [k,v] of Object.entries(THEME)) root.style.setProperty(k, v);
+}
+
+/* ═══════════════ src/js/components.js ═══════════════ */
+/* ============================================================
+   UI COMPONENT LIBRARY — reusable HTML builders
+   ============================================================
+   Views in this app are plain template strings. These helpers
+   are the sanctioned way to build common elements so styling
+   stays consistent and future changes happen in ONE place.
+
+   All builders return an HTML string. Event handlers are passed
+   as inline `onclick` strings because the app uses global
+   functions (simple, debuggable from Safari's console).
+
+   USAGE EXAMPLES
+   --------------
+   ui.btn('Save round', "saveRound()", {kind:'primary', wide:true})
+   ui.chip('56°', "pickClub('abc')", {on:true})
+   ui.card('Wedge matrix', '<table>…</table>', {tight:true})
+   ui.seg('modeSeg', [['a','Shots'],['b','Quick']], 'a', "setMode('%v')")
+   ui.stat('GIR', 'Y', {good:true, onclick:"cycleOv('gir')"})
+
+   EXTENSION POINT: add new builders here (e.g. ui.badge,
+   ui.toggle) and every view can use them immediately.
+   ============================================================ */
+const ui = {
+  /** Standard button.
+   *  @param {string} label   visible text (already-safe or esc() it yourself)
+   *  @param {string} onclick inline handler, e.g. "startRound()"
+   *  @param {object} o       {kind:'primary'|'danger'|'ghost', sm, wide, style, disabled} */
+  btn(label, onclick, o={}){
+    const cls = ['btn', o.kind||'', o.sm?'sm':'', o.wide?'wide':''].filter(Boolean).join(' ');
+    return `<button class="${cls}" ${o.disabled?'disabled':''} ${o.style?`style="${o.style}"`:''} onclick="${onclick}">${label}</button>`;
+  },
+
+  /** Pill chip, optionally selected. o = {on, sm, hint, style} */
+  chip(label, onclick, o={}){
+    const cls = ['chip', o.sm?'sm':'', o.on?'on':'', o.hint?'hint':''].filter(Boolean).join(' ');
+    return `<button class="${cls}" ${o.style?`style="${o.style}"`:''} onclick="${onclick}">${label}</button>`;
+  },
+
+  /** Card shell with the standard uppercase header.
+   *  @param {string} title   header text ('' for headerless)
+   *  @param {string} bodyHTML
+   *  @param {object} o {tight: no body padding, right: HTML for header's right side, hero: green gradient} */
+  card(title, bodyHTML, o={}){
+    const hd = title ? `<div class="hd"><span class="t">${title}</span>${o.right||''}</div>` : '';
+    return `<div class="card ${o.hero?'hero':''}">${hd}<div class="bd ${o.tight?'tight':''}">${bodyHTML}</div></div>`;
+  },
+
+  /** Segmented control. Items = [[value,label],…]; onPick receives
+   *  the value via %v substitution, e.g. "setMode('%v')". */
+  seg(id, items, current, onPick){
+    return `<div class="segs" id="${id}">` + items.map(([v,l])=>
+      `<button ${v===current?'class="on"':''} data-v="${v}" onclick="srSeg(this);${onPick.replace('%v',v)}">${l}</button>`).join('') + `</div>`;
+  },
+
+  /** Small stat pill used on the hole screen and summaries.
+   *  o = {good, bad, onclick} */
+  stat(label, value, o={}){
+    const cls = ['stat', o.good?'good':'', o.bad?'bad':''].filter(Boolean).join(' ');
+    return `<span class="${cls}" ${o.onclick?`onclick="${o.onclick}"`:''}>${label} <b>${value}</b></span>`;
+  },
+
+  /** Tappable list row with title/subtitle and chevron. */
+  listRow(title, sub, onclick, o={}){
+    return `<div class="listRow" onclick="${onclick}">${o.lead||''}
+      <div class="main"><div class="ti">${title}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>
+      ${o.trail||''}<span class="arr">›</span></div>`;
+  },
+
+  /** Labeled input. o = {id, type, placeholder, inputmode, num, onchange} */
+  field(label, value, o={}){
+    return `<label class="f">${label}</label>
+      <input class="f ${o.num?'num':''}" ${o.id?`id="${o.id}"`:''} type="${o.type||'text'}"
+        ${o.inputmode?`inputmode="${o.inputmode}"`:''} value="${value==null?'':value}"
+        ${o.placeholder?`placeholder="${o.placeholder}"`:''} ${o.onchange?`onchange="${o.onchange}"`:''}>`;
+  }
+};
+
+/* ═══════════════ src/js/06-router.js ═══════════════ */
+/* ============================================================
+   ROUTER + TAB REGISTRY
+   ============================================================
+   Navigation model:
+     TAB       which bottom-nav tab is active
+     PLAYVIEW  sub-screen inside the Play tab
+               ('home' hub | 'hole' | 'overview' | 'roundDetail'
+                | 'rounds' history list | 'course' course page)
+     MOREVIEW  sub-screen inside the More tab (see more module)
+
+   render() is the single draw call: it paints the nav from the
+   TABS registry and the body from the active tab's view fn,
+   then autosaves. Every user action ends by calling render().
+
+   EXTENSION POINT — adding a whole new tab is one entry here:
+     TABS.push({id:'goals', ic:'🎯', label:'Goals', view: vGoals});
+   …then define vGoals() returning an HTML string in a new module
+   and add that module to build.js's manifest. Nothing else.
    ============================================================ */
 let TAB='play';
-let PLAYVIEW='home';        // 'home' | 'hole' | 'overview' | 'roundDetail'
-let VIEWROUND=null;         // round id being viewed (finished)
-const NAVS=[['play','⛳','Play'],['stats','📊','Stats'],['practice','🎯','Practice'],['tips','💡','Tips'],['more','⚙︎','More']];
+let PLAYVIEW='home';
+let VIEWROUND=null;   // round id being viewed in roundDetail/overview
+let CID=null;         // course id for the course page
 
+/** Bottom-nav registry. Order here = order on screen. */
+const TABS = [
+  {id:'play',     ic:'⛳', label:'Play',     view: ()=>vPlay()},
+  {id:'stats',    ic:'📊', label:'Stats',    view: ()=>vStats()},
+  {id:'practice', ic:'🎯', label:'Practice', view: ()=>vPractice()},
+  {id:'tips',     ic:'💡', label:'Tips',     view: ()=>vTips()},
+  {id:'more',     ic:'⚙︎', label:'More',    view: ()=>vMore()},
+];
+
+/** Switch tabs. Play always lands on the hub (the "pick up where
+ *  you left off" dashboard) — resuming a hole is an explicit tap. */
 function go(tab){ TAB=tab; if(tab==='play') PLAYVIEW='home'; render(); window.scrollTo(0,0); }
+
+/** The one and only draw call. Nav from registry, body from the
+ *  active tab, storage-warning banner when localStorage is dead,
+ *  then persist. Views are pure string builders — no side effects. */
 function render(){
   document.body.classList.toggle('hivis', !!S.settings.hiVis);
-  $('#nav').innerHTML = NAVS.map(n=>
-    `<button class="${TAB===n[0]?'on':''}" onclick="go('${n[0]}')"><span class="ic">${n[1]}</span>${n[2]}</button>`).join('');
-  const v = {play:vPlay, stats:vStats, practice:vPractice, tips:vTips, more:vMore}[TAB];
+  $('#nav').innerHTML = TABS.map(t=>
+    `<button class="${TAB===t.id?'on':''}" onclick="go('${t.id}')"><span class="ic">${t.ic}</span>${t.label}</button>`).join('');
+  const tab = TABS.find(t=>t.id===TAB) || TABS[0];
   $('#view').innerHTML =
     (STORAGE_OK? '' : `<div class="banner">⚠️ Device storage is unavailable in this browser. Data will only last this session. Export a JSON backup before closing.</div>`)
-    + v();
+    + tab.view();
   save();
 }
 
 /* ============================================================
-   PLAY TAB
+   PLAY TAB — sub-router
    ============================================================ */
+/** Dispatch inside the Play tab based on PLAYVIEW. */
 function vPlay(){
   if(PLAYVIEW==='hole' && S.activeRoundId) return vHole();
   if(PLAYVIEW==='overview'){ const r=activeRound()||S.rounds.find(x=>x.id===VIEWROUND); if(r) return vOverview(r); }
@@ -621,11 +994,23 @@ function vPlay(){
   if(PLAYVIEW==='course' && CID) return vCoursePage();
   return vRoundsHome();
 }
+/** The in-progress round, or undefined when none is active. */
 function activeRound(){ return S.rounds.find(r=>r.id===S.activeRoundId); }
 
-let CID=null;   // course page id
+/* ═══════════════ src/js/07-play-home.js ═══════════════ */
+/* ============================================================
+   PLAY TAB — home hub, round history, course pages
+   ============================================================
+   vRoundsHome  the dashboard the Play tab lands on: resume card
+                for an in-progress round, recent course chips,
+                quick start, link to full history
+   vRoundsList  every finished round, newest first
+   vCoursePage  one course: location + Maps link, tee data,
+                per-hole history table, rounds played there
+   ============================================================ */
 function lastRoundAt(cid){ const rs=finishedRounds().filter(r=>r.courseId===cid); return rs.length? rs[rs.length-1]:null; }
 
+/** The Play hub: resume hero, quick start, recent course chips, history link. */
 function vRoundsHome(){
   const idx = currentIndex();
   const act = activeRound();
@@ -671,8 +1056,10 @@ function vRoundsHome(){
     <button class="btn" onclick="courseEditor(null,false)">＋ New course</button>
   </div>`;
 }
+/** Jump to the course page for a course id. */
 function mgoCourses(){ TAB='more'; MOREVIEW='courses'; render(); }
 
+/** Full round history, newest first, with 18B / nine badges. */
 function vRoundsList(){
   const past=[...S.rounds].filter(r=>r.finished).sort((a,b)=> a.date<b.date?1:-1);
   return `<button class="btn sm ghost" onclick="PLAYVIEW='home';render()" style="margin-bottom:10px">‹ Play</button>
@@ -733,6 +1120,7 @@ function vCoursePage(){
         <div class="sub">${fmtDate(r.date)} · ${d.putts} putts${r.legacy?' · 18B':''}</div></div><span class="arr">›</span></div>`;}).join('')||'<div style="padding:14px" class="muted">No rounds here yet.</div>'}
   </div></div>`;
 }
+/** Persist a course info field (city/state/address) as it is edited. */
 function cInfo(cid,k,v){ const c=S.courses.find(x=>x.id===cid); c.info=c.info||{}; c.info[k]=v.trim(); save(); }
 
 /* ---------------- start round ---------------- */
@@ -765,14 +1153,19 @@ function startRoundSheet(prefCourse){
     <button class="btn wide ghost" onclick="courseEditor(null,true)">＋ New course instead</button>`);
   srTees();
 }
+/** Segmented-control click handler: move the .on class to the tapped button. */
 function srSeg(btn){ [...btn.parentElement.children].forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
+/** Read a segmented control\u2019s selected data-v value. */
 function srSegVal(id){ const b=document.querySelector('#'+id+' button.on'); return b? b.dataset.v : null; }
+/** Repopulate the tee dropdown after a course change (stub courses get a hint). */
 function srTees(){
   const c=S.courses.find(c=>c.id===$('#srCourse').value);
   const ts=(c.tees||[]);
   $('#srTee').innerHTML = ts.length? ts.map(t=>`<option value="${t.id}">${esc(t.name)} · ${t.rating||'?'} / ${t.slope||'?'}</option>`).join('')
     : `<option value="">No tee data yet — pick to set up</option>`;
 }
+/** Build the round object (slicing F9/B9 holes) and enter play. Guards
+ *  imported stub courses by opening the editor prefilled instead. */
 function startRound(){
   const c=S.courses.find(c=>c.id===$('#srCourse').value);
   const t=(c.tees||[]).find(t=>t.id===$('#srTee').value);
@@ -787,10 +1180,22 @@ function startRound(){
   S.rounds.push(r); S.activeRoundId=r.id; PLAYVIEW='hole'; closeSheet(); render();
 }
 
+
+/* ═══════════════ src/js/08-course-editor.js ═══════════════ */
 /* ============================================================
-   COURSE EDITOR — fast manual grid + paste-from-photo parser
+   COURSE EDITOR — three ways in, one verification grid out
+   ============================================================
+   1. Manual: 18-row grid, par defaults to 4, done in <60s.
+   2. Paste parser: iPhone Live Text copies the scorecard
+      (on-device OCR); ceParse() classifies the numbers —
+      3-5 = pars, 100-650 = yardages, leftover 1-18 = stroke
+      index, decimal 60-80 = rating with its neighbor as slope.
+   3. Online (optional): golfcourseapi.com with a free key from
+      Settings — fills name, location, rating, slope, 18 holes.
+   All three land in the same editable CE draft before saving.
    ============================================================ */
 let CE=null; // {courseId|null, name, teeName, rating, slope, holes[], startAfter}
+/** Open the editor: blank 18×par-4 draft, or prefilled from an existing course. */
 function courseEditor(courseId, startAfter){
   CE={courseId, startAfter:!!startAfter, name:'', teeName:'White', rating:'', slope:'',
       info:{address:'',city:'',state:''},
@@ -799,6 +1204,7 @@ function courseEditor(courseId, startAfter){
     const t=c.tees[0]; if(t){CE.teeName=t.name;CE.rating=t.rating;CE.slope=t.slope;CE.holes=t.holes.map(h=>({...h}));} }
   renderCourseEditor();
 }
+/** Draw the editor sheet: name/location/tee fields + the 18-row grid. */
 function renderCourseEditor(){
   const rows = CE.holes.map((h,i)=>`<tr>
     <td class="hn">${h.n}</td>
@@ -827,12 +1233,16 @@ function renderCourseEditor(){
     <div style="height:6px"></div>
     <button class="btn primary wide" onclick="ceSave()">Save course</button>`);
 }
+/** Par button tap for row i (grabs live inputs first so nothing is lost). */
 function cePar(i,p){ CE.holes[i].par=p; ceGrab(); renderCourseEditor(); }
+/** Store a yardage/SI cell as it changes. */
 function ceSet(i,k,v){ CE.holes[i][k]=parseInt(v)||''; }
+/** Pull every live input into the CE draft before re-rendering or saving. */
 function ceGrab(){ CE.name=$('#ceName').value; CE.teeName=$('#ceTee').value; CE.rating=$('#ceRating').value; CE.slope=$('#ceSlope').value;
   if($('#ceCity')) CE.info.city=$('#ceCity').value.trim();
   if($('#ceState')) CE.info.state=$('#ceState').value.trim();
   document.querySelectorAll('.crsGrid input').forEach((inp,j)=>{ const i=Math.floor(j/2); if(j%2===0)CE.holes[i].ydg=parseInt(inp.value)||''; else CE.holes[i].si=parseInt(inp.value)||''; }); }
+/** Sheet for pasting Live-Text scorecard output into the parser. */
 function cePasteUI(){
   ceGrab();
   openSheet(`<div class="sheetHd"><span class="t">Paste scorecard text</span><button class="btn sm ghost" onclick="renderCourseEditor()">Back</button></div>
@@ -841,6 +1251,9 @@ function cePasteUI(){
     <div style="height:10px"></div>
     <button class="btn primary wide" onclick="ceParse()">Read numbers → verify grid</button>`);
 }
+/** Heuristic number classifier: pars, yardages, stroke index, rating, slope
+ *  (slope is matched next to the decimal rating first so it can\u2019t be eaten
+ *  as a yardage). Fills the grid for verification. */
 function ceParse(){
   const txt=$('#cePaste').value;
   const nums=(txt.match(/\d+(\.\d+)?/g)||[]).map(Number);
@@ -874,6 +1287,7 @@ function ceParse(){
   renderCourseEditor();
   toast(`Read ${pars.length} pars, ${ydgs.length} yardages${sis.length===18?', 18 stroke indexes':''}${rating?', rating '+rating:''}${slope?', slope '+slope:''}. Verify below.`);
 }
+/** Validate + persist the course (updating tee in place keeps round links). */
 function ceSave(){
   ceGrab();
   if(!CE.name.trim()){ toast('Name the course'); return; }
@@ -890,8 +1304,63 @@ function ceSave(){
   if(CE.startAfter) startRoundSheet(); else render();
 }
 
+/** Authenticated GET against api.golfcourseapi.com (optional online path). */
+async function gcApi(path){
+  const res = await fetch('https://api.golfcourseapi.com/v1/'+path, {headers:{'Authorization':'Key '+S.settings.gcApiKey}});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return res.json();
+}
+/** Search courses by the typed name; user picks a result to apply. */
+async function gcSearch(){
+  ceGrab();
+  const q = CE.name.trim(); if(!q){ toast('Type the course name first.'); return; }
+  toast('Searching…');
+  try{
+    const data = await gcApi('search?search_query='+encodeURIComponent(q));
+    GCRES = (data.courses||[]).slice(0,5);
+    if(!GCRES.length){ toast('No matches. Paste or type it instead.'); return; }
+    openSheet(`<div class="sheetHd"><span class="t">Pick your course</span><button class="btn sm ghost" onclick="renderCourseEditor()">Back</button></div>
+      ${GCRES.map((c,i)=>{
+        const tees=((c.tees&&c.tees.male)||[]).concat((c.tees&&c.tees.female)||[]);
+        return `<div class="card"><div class="bd">
+          <div style="font-weight:800">${esc(c.club_name||'')}${c.course_name&&c.course_name!==c.club_name? ' — '+esc(c.course_name):''}</div>
+          <div class="small muted">${esc([c.location&&c.location.city, c.location&&c.location.state].filter(Boolean).join(', '))}</div>
+          <div class="chips" style="margin-top:8px">${tees.map((t,j)=>`<button class="chip sm" onclick="gcApply(${i},${j})">${esc(t.tee_name)} · ${t.course_rating||'?'} / ${t.slope_rating||'?'}</button>`).join('')||'<span class="small muted">no tee data</span>'}</div>
+        </div></div>`;}).join('')}`);
+  }catch(e){
+    toast('Lookup failed ('+e.message+'). If this keeps happening the API may block browser requests — the paste import always works.');
+  }
+}
+/** Map an API course onto the CE draft: location, tee rating/slope, 18 holes. */
+function gcApply(ci,ti){
+  const c=GCRES[ci];
+  const tees=((c.tees&&c.tees.male)||[]).concat((c.tees&&c.tees.female)||[]);
+  const t=tees[ti]; if(!t) return;
+  CE.name = CE.name || c.club_name || '';
+  if(!CE.name.trim()) CE.name = c.club_name||c.course_name||'';
+  CE.teeName = t.tee_name||'Tee';
+  CE.rating = t.course_rating||''; CE.slope = t.slope_rating||'';
+  CE.info = {address:(c.location&&c.location.address)||'', city:(c.location&&c.location.city)||'', state:(c.location&&c.location.state)||''};
+  (t.holes||[]).slice(0,18).forEach((hh,i)=>{ CE.holes[i]={n:i+1, par:hh.par||4, ydg:hh.yardage||'', si:hh.handicap||''}; });
+  renderCourseEditor();
+  toast('Filled from golfcourseapi.com — verify the grid.');
+}
+/** From a course page: fetch and fill location fields for an existing course. */
+function gcFill(courseId){ courseEditor(courseId,false); setTimeout(gcSearch, 50); }
+
+
+/* ═══════════════ src/js/09-hole.js ═══════════════ */
 /* ============================================================
-   HOLE SCREEN
+   HOLE SCREEN — the on-course surface
+   ============================================================
+   Two entry modes per round, switchable any time:
+     Shots  full shot-by-shot with the notation system
+     Quick  Grint-style per-hole summary writing into h.ov
+            (score, putts, first-putt ft, fairway, green pad,
+             sand, penalties) — derivation reads ov as overrides
+   Also here: per-hole wind, the drinks counter, hole history
+   ("played 14×, avg 4.5"), derived stat chips (tap to override),
+   and prev/next navigation that finishes into the overview.
    ============================================================ */
 function vHole(){
   const r=activeRound(); if(!r){PLAYVIEW='home'; return vRoundsHome();}
@@ -937,6 +1406,7 @@ function vHole(){
     <button class="btn primary" onclick="navHole(1)">${r.curHole===r.holes.length?'Finish ▸':'›'}</button>
   </div>`;
 }
+/** Advanced mode: the tappable shot list + Add shot / Penalty+drop. */
 function vShotsPanel(r,h,d){
   const shotRows = h.shots.map((s,i)=>{
     const fin = s.fType==='lat'? (s.lat||'') : s.fType==='green'? (s.pad? s.pad+'g':'') : s.fType==='putt'? (s.pad? s.pad+'p':'') : '';
@@ -984,18 +1454,26 @@ function vBasicPanel(r,h,d){
     </div>
   </div></div>`;
 }
+/** Quick-mode toggle-set of an ov field (tap again to clear). */
 function bset(k,v){ const h=curHole(); h.ov=h.ov||{};
   h.ov[k] = h.ov[k]===v? undefined : v;
   if(h.ov[k]===undefined) delete h.ov[k];
   render(); }
+/** Quick-mode counter increment (sand, penalties). */
 function bstep(k,dv){ const h=curHole(); h.ov=h.ov||{}; h.ov[k]=Math.max(0,(h.ov[k]||0)+dv); render(); }
+/** Wipe every override on the current hole. */
 function bclear(){ const h=curHole(); h.ov={}; render(); }
+/** Quick-mode green pad: digit sets girPad, and GIR = (digit===5). */
 function bPad(dgt){ const h=curHole(); h.ov=h.ov||{};
   if(h.ov.girPad===dgt){ delete h.ov.girPad; delete h.ov.gir; }
   else { h.ov.girPad=dgt; h.ov.gir = dgt===5? 'Y':'N'; }
   render(); }
+/** Flip the active round between 'advanced' and 'basic' — any time. */
 function setMode(m){ activeRound().mode=m; render(); }
+/** The on-course drinks counter. Hydration data is data. */
 function addDrink(){ const r=activeRound(); r.ctx=r.ctx||{drinks:0}; r.ctx.drinks=(r.ctx.drinks||0)+1; render(); }
+/** Past performance on this exact hole at this course (includes 18B imports):
+ *  {n: times played, avg, best}. */
 function holeHistory(courseId, holeN, excludeId){
   const scores=[];
   S.rounds.forEach(r=>{ if(!r.finished||r.courseId!==courseId||r.id===excludeId) return;
@@ -1003,16 +1481,23 @@ function holeHistory(courseId, holeN, excludeId){
       const sc=r.legacy? h.strokes : deriveHole(h).score; if(sc!=null) scores.push(sc); }); });
   return {n:scores.length, avg:mean(scores), best:scores.length?Math.min(...scores):null};
 }
+/** Toggle per-hole wind direction (H/D/L2R/R2L); auto-sets strength 1. */
 function setWind(w){ const h=curHole(); h.windD = h.windD===w? '':w; if(!h.windD)h.windS=0; else if(!h.windS)h.windS=1; render(); }
+/** Set wind strength 1-3. */
 function setWindS(n){ curHole().windS=n; render(); }
+/** The hole object currently on screen. */
 function curHole(){ const r=activeRound(); return r.holes[r.curHole-1]; }
+/** Prev/next hole; next past the last hole opens the finish overview. */
 function navHole(dir){
   const r=activeRound(); const nH=r.holes.length;
   if(dir>0 && r.curHole===nH){ PLAYVIEW='overview'; render(); return; }
   r.curHole=Math.min(nH,Math.max(1,r.curHole+dir)); render();
 }
+/** Adjust the hole\u2019s penalty count (tap the PEN row to remove). */
 function adjPen(d){ const h=curHole(); h.pen=Math.max(0,(h.pen||0)+d); render(); }
+/** One tap: +1 penalty and open the shot sheet prefilled with an HZ drop. */
 function penaltyDrop(){ const h=curHole(); h.pen=(h.pen||0)+1; render(); newShot('HZ'); }
+/** Tap a derived chip to override it (FIR/GIR cycle Y↔N, U&D toggles made). */
 function cycleOv(k){
   const h=curHole(); h.ov=h.ov||{};
   if(k==='fir'||k==='gir'){ const cur=deriveHole(h)[k]; const seq= k==='fir'&&h.par<=3? ['-']:['Y','N']; 
@@ -1021,10 +1506,24 @@ function cycleOv(k){
   render();
 }
 
+
+/* ═══════════════ src/js/10-shot-sheet.js ═══════════════ */
 /* ============================================================
-   SHOT SHEET — the core entry surface
+   SHOT SHEET — the tap-first entry surface (optimize this!)
+   ============================================================
+   Target: 4-6 taps per shot. Smart defaults do the work:
+   lie prefills from context (first shot T, after a green
+   attempt GR…), typing distance highlights the closest club,
+   and the finish control switches automatically — lateral
+   buttons for tee balls/layups, green pad for approaches,
+   putt pad (in feet) on a GR lie. Shape/effort/strike/note
+   stay collapsed and never block saving.
+   SH = the open draft {idx: shot index or null-for-new, s: shot,
+   more: detail section expanded, distStr: keypad buffer}.
    ============================================================ */
 let SH=null; // draft {holeRef, idx|null, s:{...}, more:false}
+/** New shot with context-smart defaults: lie from the previous shot,
+ *  club from estimated remaining distance, feet on the green. */
 function blankShot(prefLie){
   const h=curHole();
   const prev=h.shots[h.shots.length-1];
@@ -1040,15 +1539,20 @@ function blankShot(prefLie){
     dist: null, unit: lie==='GR'?'f':'y', fType:null, lat:null, pad:null,
     shape:null, effort:null, frac:null, strike:null, note:''};
 }
+/** Rough remaining-distance guess to preselect a club (no GPS needed). */
 function estRemaining(h){
   if(!h.shots.length) return h.ydg||null;
   const last=h.shots[h.shots.length-1];
   if(last.unit==='y'&&last.dist&&last.clubId){ const c=club(last.clubId); if(c&&c.stock) return Math.max(0, last.dist - c.stock) || Math.round(last.dist*0.12); }
   return null;
 }
+/** Open the sheet for a fresh shot (optionally forcing a lie, e.g. HZ). */
 function newShot(prefLie){ SH={idx:null, s:blankShot(prefLie), more:false, distStr:''}; renderShotSheet(); }
+/** Open the sheet on an existing shot, detail section expanded. */
 function editShot(i){ const h=curHole(); SH={idx:i, s:JSON.parse(JSON.stringify(h.shots[i])), more:true, distStr: h.shots[i].dist!=null? String(h.shots[i].dist):''}; renderShotSheet(); }
 
+/** Choose which finish control to show: putt on GR, lateral for driver/tee
+ *  balls on par 4/5, green attempt for reachable approaches. */
 function defaultFType(s){
   if(s.lie==='GR') return 'putt';
   const c=club(s.clubId);
@@ -1058,6 +1562,7 @@ function defaultFType(s){
   if(curHole().par===3 && s.lie==='T') return 'green';
   return c && (c.type==='Wg'||c.type==='I')? 'green':'lat';
 }
+/** Draw the whole entry sheet from the SH draft (called on every tap). */
 function renderShotSheet(){
   const s=SH.s;
   if(s.lie==='GR'){ s.unit='f'; if(!s.clubId) s.clubId=putterId(); }
@@ -1121,6 +1626,8 @@ function renderShotSheet(){
     </div><div style="height:8px"></div><button class="btn sm wide ghost" onclick="insertBefore()">Insert a missed shot before this one</button>`:''}
   `);
 }
+/** Render any 3×3 numpad (green/putt/shape) with axis labels; `fn` is the
+ *  global click handler name. Shared by entry AND settings preview. */
 function padHTML(kind, sel, fn){
   const rows=padRows(kind), lab=PAD_LABELS[kind], ax=PAD_AXES[kind];
   const topAx = (kind==='shape'&&!S.settings.shapeTopDraw)? ['FADE ↑','DRAW ↓'] : ax;
@@ -1132,6 +1639,8 @@ function padHTML(kind, sel, fn){
   b+=`<div class="axis"><span></span><span>${topAx[1]}</span><span></span></div></div>`;
   return b;
 }
+/** Sheet field setter with the side-effect rules (lie change resets finish,
+ *  GR forces putter + feet, fraction clears effort, etc.). */
 function shSet(k,v){
   if(k==='lie'){ SH.s.lie=v; SH.s.fType=null; SH.s.pad=null; SH.s.lat=null;
     if(v==='GR'){SH.s.unit='f'; SH.s.clubId=putterId();} else {SH.s.unit='y'; if(SH.s.clubId===putterId()) SH.s.clubId=null;} }
@@ -1141,6 +1650,7 @@ function shSet(k,v){
   else { if(k==='clubId') SH.userPickedClub=true; SH.s[k]=v; }
   renderShotSheet();
 }
+/** Distance keypad input; re-suggests a club unless the player picked one. */
 function shKey(k){
   if(k==='C') SH.distStr='';
   else if(k==='B') SH.distStr=SH.distStr.slice(0,-1);
@@ -1149,22 +1659,35 @@ function shKey(k){
   if(SH.s.lie!=='GR' && !SH.userPickedClub){ const sg=suggestClub(SH.s.dist); if(sg) SH.s.clubId=sg; }
   renderShotSheet();
 }
+/** Finish pad tap (toggle). */
 function shPad(d){ SH.s.pad = SH.s.pad===d? null:d; renderShotSheet(); }
+/** Shape pad tap (toggle). */
 function shShape(d){ SH.s.shape = SH.s.shape===d? null:d; renderShotSheet(); }
+/** Commit the draft into the hole (append or replace) and close. */
 function saveShot(){
   const h=curHole(); const s=SH.s;
   s.dist = SH.distStr? parseInt(SH.distStr) : s.dist;
   if(SH.idx==null) h.shots.push(s); else h.shots[SH.idx]=s;
   closeSheet(); render();
 }
+/** Delete the shot being edited. */
 function delShot(){ curHole().shots.splice(SH.idx,1); closeSheet(); render(); }
+/** Reorder the shot up/down within the hole (post-hole reconstruction). */
 function moveShot(d){ const a=curHole().shots; const j=SH.idx+d; if(j<0||j>=a.length)return;
   [a[SH.idx],a[j]]=[a[j],a[SH.idx]]; SH.idx=j; renderShotSheet(); render(); }
+/** Insert a forgotten shot before the one being edited. */
 function insertBefore(){ const h=curHole(); const ins=blankShot(); h.shots.splice(SH.idx,0,ins);
   SH={idx:SH.idx, s:h.shots[SH.idx], more:false, distStr:''}; renderShotSheet(); }
 
+
+/* ═══════════════ src/js/11-round-views.js ═══════════════ */
 /* ============================================================
-   ROUND OVERVIEW + FINISH + PAST ROUND DETAIL
+   ROUND OVERVIEW + FINISH + PAST-ROUND DETAIL
+   ============================================================
+   vOverview      the 18-cell at-a-glance grid (color = vs par)
+                  + finish/discard for live rounds
+   vRoundDetail   a finished round hole-by-hole, reopenable
+   vLegacyDetail  read-only view for 18Birdies imports
    ============================================================ */
 function vOverview(r){
   const rd=deriveRound(r);
@@ -1200,14 +1723,17 @@ function vOverview(r){
       <div style="height:8px"></div><button class="btn wide danger" onclick="if(confirm('Discard this round entirely?')){S.rounds=S.rounds.filter(x=>x.id!=='${r.id}');S.activeRoundId=null;PLAYVIEW='home';render();}">Discard round</button>`
     : `<button class="btn wide" onclick="exportRoundText('${r.id}')">Copy AI text export</button>`}`;
 }
+/** Tap a cell to jump straight to that hole (live rounds only). */
 function jumpHole(n){ const r=activeRound()||S.rounds.find(x=>x.id===VIEWROUND); if(!r||r.finished) return;
   const i=r.holes.findIndex(h=>h.n===n); if(i>=0){ r.curHole=i+1; PLAYVIEW='hole'; render(); } }
+/** Close out the round, stamp differentials, land on the detail view. */
 function finishRound(){
   const r=activeRound(); r.finished=true; S.activeRoundId=null;
   handicapTimeline(); // stamps _diff
   VIEWROUND=r.id; PLAYVIEW='roundDetail'; render();
   toast('Round saved. Stats updated.');
 }
+/** A finished round hole-by-hole with per-hole shot summaries. */
 function vRoundDetail(id){
   const r=S.rounds.find(x=>x.id===id); if(!r){PLAYVIEW='home';return vRoundsHome();}
   if(r.legacy) return vLegacyDetail(r);
@@ -1233,9 +1759,12 @@ function vRoundDetail(id){
     <div style="height:8px"></div>
     <button class="btn wide danger sm" onclick="if(confirm('Delete this round?')){S.rounds=S.rounds.filter(x=>x.id!=='${r.id}');PLAYVIEW='home';render();}">Delete round</button>`;
 }
+/** Reopen a finished round directly onto one hole for edits. */
 function reopenHole(rid,n){ const r=S.rounds.find(x=>x.id===rid); r.finished=false; S.activeRoundId=rid; r.curHole=n; PLAYVIEW='hole'; render(); }
+/** Reopen a finished round for editing wherever it was left. */
 function reopenRound(rid){ const r=S.rounds.find(x=>x.id===rid); r.finished=false; S.activeRoundId=rid; PLAYVIEW='hole'; render(); }
 
+/** Read-only detail for an 18Birdies import: strokes grid + aggregates. */
 function vLegacyDetail(r){
   const rd=deriveRound(r);
   const c=courseOf(r);
@@ -1259,56 +1788,35 @@ function vLegacyDetail(r){
   <button class="btn wide danger sm" onclick="if(confirm('Delete this imported round?')){S.rounds=S.rounds.filter(x=>x.id!=='${r.id}');PLAYVIEW='home';render();}">Delete round</button>`;
 }
 
+/** Set the round vibe rating from the detail view. */
 function rVibe(id,v){ const r=S.rounds.find(x=>x.id===id); r.ctx=r.ctx||{}; r.ctx.vibe=v; render(); }
 
+/** Quick-finish helper: append a gimme putt to the current hole. */
 function tapIn(){ SH.distStr='2'; SH.s.dist=2; SH.s.pad=5; SH.s.fType='putt'; saveShot(); }
 
 /* Online course lookup via golfcourseapi.com — optional; offline paths stand alone. */
 let GCRES=null;
-async function gcApi(path){
-  const res = await fetch('https://api.golfcourseapi.com/v1/'+path, {headers:{'Authorization':'Key '+S.settings.gcApiKey}});
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  return res.json();
-}
-async function gcSearch(){
-  ceGrab();
-  const q = CE.name.trim(); if(!q){ toast('Type the course name first.'); return; }
-  toast('Searching…');
-  try{
-    const data = await gcApi('search?search_query='+encodeURIComponent(q));
-    GCRES = (data.courses||[]).slice(0,5);
-    if(!GCRES.length){ toast('No matches. Paste or type it instead.'); return; }
-    openSheet(`<div class="sheetHd"><span class="t">Pick your course</span><button class="btn sm ghost" onclick="renderCourseEditor()">Back</button></div>
-      ${GCRES.map((c,i)=>{
-        const tees=((c.tees&&c.tees.male)||[]).concat((c.tees&&c.tees.female)||[]);
-        return `<div class="card"><div class="bd">
-          <div style="font-weight:800">${esc(c.club_name||'')}${c.course_name&&c.course_name!==c.club_name? ' — '+esc(c.course_name):''}</div>
-          <div class="small muted">${esc([c.location&&c.location.city, c.location&&c.location.state].filter(Boolean).join(', '))}</div>
-          <div class="chips" style="margin-top:8px">${tees.map((t,j)=>`<button class="chip sm" onclick="gcApply(${i},${j})">${esc(t.tee_name)} · ${t.course_rating||'?'} / ${t.slope_rating||'?'}</button>`).join('')||'<span class="small muted">no tee data</span>'}</div>
-        </div></div>`;}).join('')}`);
-  }catch(e){
-    toast('Lookup failed ('+e.message+'). If this keeps happening the API may block browser requests — the paste import always works.');
-  }
-}
-function gcApply(ci,ti){
-  const c=GCRES[ci];
-  const tees=((c.tees&&c.tees.male)||[]).concat((c.tees&&c.tees.female)||[]);
-  const t=tees[ti]; if(!t) return;
-  CE.name = CE.name || c.club_name || '';
-  if(!CE.name.trim()) CE.name = c.club_name||c.course_name||'';
-  CE.teeName = t.tee_name||'Tee';
-  CE.rating = t.course_rating||''; CE.slope = t.slope_rating||'';
-  CE.info = {address:(c.location&&c.location.address)||'', city:(c.location&&c.location.city)||'', state:(c.location&&c.location.state)||''};
-  (t.holes||[]).slice(0,18).forEach((hh,i)=>{ CE.holes[i]={n:i+1, par:hh.par||4, ydg:hh.yardage||'', si:hh.handicap||''}; });
-  renderCourseEditor();
-  toast('Filled from golfcourseapi.com — verify the grid.');
-}
-function gcFill(courseId){ courseEditor(courseId,false); setTimeout(gcSearch, 50); }
+
+/* ═══════════════ src/js/12-stats.js ═══════════════ */
 /* ============================================================
-   STATS TAB
+   STATS TAB — the payoff
+   ============================================================
+   Order on screen: filter chips → handicap → scoring (all
+   normalized to per-18 so nines don't distort) → tee-to-green
+   → putting + first-putt table → hot/best clubs → the three
+   miss-pattern heatmaps → stock yardages → wedge matrix.
+
+   HM = heatmap filter state {kind, clubId, span, band}.
+   Quick-mode holes contribute their green pad (ov.girPad) to
+   the green heatmap; shot-tracked holes feed everything.
+
+   EXTENSION POINT — adding a stat card is: compute inside
+   vStats() from `rds`/`agg`, append one ui.card()/template to
+   the returned string. See hotClubsCard() as the model.
    ============================================================ */
 let HM = {kind:'green', clubId:'', span:'all', band:''};   // heatmap filters
 
+/** Flatten rounds → [{r,h,s}] for every shot (heatmaps, yardages). */
 function allShots(spanRounds){
   const rs = spanRounds || finishedRounds();
   const out=[];
@@ -1317,6 +1825,7 @@ function allShots(spanRounds){
 }
 
 
+/** The global filter chips (time window) + course dropdown driving STATF. */
 function statFilterBar(){
   const times=[['all','All time'],['ytd','This year'],['l90','90 days'],['l5','Last 5']];
   const courses=[...new Set(finishedRounds().map(r=>r.courseId))].map(id=>S.courses.find(c=>c.id===id)).filter(Boolean);
@@ -1327,6 +1836,8 @@ function statFilterBar(){
     <option value="">All courses</option>
     ${courses.map(c=>`<option value="${c.id}" ${STATF.courseId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`:''}`;
 }
+/** The dashboard. Composed of cards top-to-bottom; see module header for
+ *  the extension recipe. All scoring uses per-18 normalization. */
 function vStats(){
   const rs=filteredRounds();
   if(!rs.length) return `<div class="pageTitle"><h1>Stats</h1></div>${statFilterBar()}
@@ -1457,7 +1968,9 @@ function hotClubsCard(rs){
     <div class="small muted" style="padding:8px 12px">Pin-high = finished 5 on the green pad. 🔥 running 10+ points above baseline over the last five rounds; ❄️ the opposite. Minimum 5 attempts.</div>
   </div></div>`;
 }
+/** Big-number + small-label cell used inside stat grids. */
 function bignum(v,l){ return `<div><div class="num" style="font-size:24px;font-weight:800">${v}</div><div class="small muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700">${l}</div></div>`; }
+/** "Course handicap at <last course>" line under the index. */
 function courseHcpLine(idx){
   const last=finishedRounds().slice(-1)[0]; const tee=teeOf(last);
   if(!tee||!tee.slope) return '';
@@ -1465,6 +1978,7 @@ function courseHcpLine(idx){
   const ch=courseHandicap(idx,tee.slope,tee.rating,parT);
   return `<div class="small" style="margin-top:6px">Course handicap at ${esc(courseOf(last).name)} (${esc(tee.name)}): <b class="num">${ch}</b></div>`;
 }
+/** Minimal inline SVG sparkline (last point flagged red). */
 function spark(vals){
   if(vals.length<2) return '';
   const w=300,ht=54,pad=4;
@@ -1516,8 +2030,11 @@ function heatmapCard(){
     <div class="small muted" style="margin-top:8px">${heatRead()}</div>
   </div></div>`;
 }
+/** Distance-band filter for full shots (yards). */
 function bandOK(s){ if(!HM.band)return true; const [a,b]=HM.band.split('-').map(Number); return s.unit==='y'&&s.dist!=null&&s.dist>=a&&s.dist<=b; }
+/** Distance-band filter for putts (feet). */
 function bandOKputt(s){ if(!HM.band)return true; const [a,b]=HM.band.split('-').map(Number); return s.dist!=null&&s.dist>=a&&s.dist<=b; }
+/** One-line interpretation hint per heatmap kind. */
 function heatRead(){
   return {green:'Hot bottom row (1·2·3) = chronic short miss — take more club. Hot right column = right-miss pattern.',
     putt:'Hot 2 = dying it short-center (pace). Hot 6 = sliding by right (read or face). 5 is holed.',
@@ -1536,6 +2053,8 @@ function clubShotDists(cid){
     (b.shots||[]).forEach(sh=>{ if(sh.carry) prac.push(Number(sh.carry)); }); }));
   return {round, prac, all:round.concat(prac)};
 }
+/** Median + 25-75% band per club, Δ-flag when reality drifts ≥8y from the
+ *  set number — the missing-zone detector. */
 function stockYardCard(){
   const rows=S.clubs.filter(c=>c.type!=='P').map(c=>{
     const d=clubShotDists(c.id);
@@ -1573,6 +2092,15 @@ function wedgeMatrixCard(){
   </div></div>`;
 }
 
+/* ═══════════════ src/js/13-practice.js ═══════════════ */
+/* ============================================================
+   PRACTICE — drill library + sessions + launch-monitor data
+   ============================================================
+   DRILLS is a plain array — add a drill = add a row.
+   Sessions hold club "blocks" of TrackMan-style shots (visible
+   columns configurable in Settings) plus putting drill rows.
+   Practice carries feed stock yardages and the wedge matrix.
+   ============================================================ */
 /* ---------------- drill library ---------------- */
 const DRILLS = [
   {cat:'Wedges', name:'Wedge ladder', how:'Pick one wedge. Hit 3 balls each at ½, ¾ and full. Log carries per block — the medians build your wedge matrix. Goal: three distinct, repeatable numbers per wedge.'},
@@ -1590,6 +2118,7 @@ const DRILLS = [
    PRACTICE TAB
    ============================================================ */
 let PRACVIEW=null; // session id
+/** Practice home: drill library (collapsible, by category) + session list. */
 function vPractice(){
   if(PRACVIEW) return vSession(PRACVIEW);
   const list=[...S.practice].sort((a,b)=>a.date<b.date?1:-1).map(p=>{
@@ -1612,11 +2141,14 @@ function vPractice(){
     <div class="card"><div class="hd"><span class="t">Sessions</span></div>
     <div class="bd tight">${list||'<div style="padding:14px" class="muted">Log range work, TrackMan numbers, and putting drills here. It all feeds stock yardages and the wedge matrix.</div>'}</div></div>`;
 }
+/** Create and open an empty session. */
 function newSession(){
   const p={id:uid(),date:todayISO(),location:'',focus:'',notes:'',blocks:[],putting:[]};
   S.practice.push(p); PRACVIEW=p.id; render();
 }
+/** The session currently open. */
 function prac(){ return S.practice.find(p=>p.id===PRACVIEW); }
+/** Session editor: meta fields, TrackMan blocks with live avg±sd, putting rows. */
 function vSession(id){
   const p=S.practice.find(x=>x.id===id); if(!p){PRACVIEW=null;return vPractice();}
   const cols=S.settings.tmCols;
@@ -1660,19 +2192,33 @@ function vSession(id){
     <div style="padding:8px 12px"><button class="btn sm" onclick="prac().putting.push({});render()">＋ Drill row</button></div></div></div>
   <div class="small muted">Which TrackMan columns show is configurable in More → Settings.</div>`;
 }
+/** Store one TrackMan cell as it is typed. */
 function tmSet(bi,si,c,v){ prac().blocks[bi].shots[si][c]= v===''? null: Number(v); save(); }
+/** Sheet to pick the club (and optional wedge fraction) for a new block. */
 function addBlockSheet(){
   openSheet(`<div class="sheetHd"><span class="t">New club block</span><button class="btn sm ghost" onclick="closeSheet()">Cancel</button></div>
     <div class="sec">Club</div><div class="chips">${S.clubs.filter(c=>c.type!=='P').map(c=>`<button class="chip" onclick="addBlock('${c.id}',null)">${esc(c.label)}</button>`).join('')}</div>
     <div class="sec">Wedge fraction (optional)</div>
     <div class="chips">${S.clubs.filter(c=>c.type==='Wg').map(c=>FRACS.map(f=>`<button class="chip sm" onclick="addBlock('${c.id}','${f}')">${esc(c.label)} ${f}</button>`).join('')).join('')}</div>`);
 }
+/** Append a block and start its first shot row. */
 function addBlock(cid,frac){ prac().blocks.push({id:uid(),clubId:cid,frac:frac,shots:[{}]}); closeSheet(); render(); }
 
+/** One tap from the library: new session pre-focused on that drill. */
+function startDrill(name){ const p={id:uid(),date:todayISO(),location:'',focus:name,notes:'',blocks:[],putting:[]};
+  S.practice.push(p); PRACVIEW=p.id; render(); }
+
+/* ═══════════════ src/js/14-tips.js ═══════════════ */
 /* ============================================================
-   TIPS TAB
+   TIPS — searchable, taggable swing-thought library
+   ============================================================
+   One tip may be pinned as "today's thought" and surfaces on
+   the hole screen. Tips can carry a link and a photo (photos
+   are canvas-compressed to ~100 KB before storing — they share
+   the ~5 MB localStorage budget, hence the compression).
    ============================================================ */
 let TIPQ='', TIPTAG='';
+/** Search + tag-filtered tip list, pinned first. */
 function vTips(){
   const tags=[...new Set(S.tips.flatMap(t=>t.tags||[]))].sort();
   const list=S.tips.filter(t=>{
@@ -1694,9 +2240,11 @@ function vTips(){
     <div>${(t.tags||[]).map(g=>`<span class="tag">${esc(g)}</span>`).join('')}</div>
   </div>`).join('') || '<p class="muted">Nothing matches.</p>'}`;
 }
+/** Pin as "today\u2019s thought" (only one at a time) — surfaces on the hole screen. */
 function togglePin(id){ const t=S.tips.find(x=>x.id===id);
   if(!t.pinned) S.tips.forEach(x=>x.pinned=false); // one "today's thought" at a time
   t.pinned=!t.pinned; render(); }
+/** Create/edit sheet: title, body, link, photo, tags with suggestions. */
 function tipEditor(id){
   TIPPHOTO=null;
   const t=id? S.tips.find(x=>x.id===id) : {title:'',body:'',tags:[]};
@@ -1715,9 +2263,11 @@ function tipEditor(id){
     <button class="btn primary wide" onclick="tipSave('${id||''}')">Save</button>
     ${id?`<div style="height:8px"></div><button class="btn wide danger sm" onclick="S.tips=S.tips.filter(x=>x.id!=='${id}');closeSheet();render()">Delete</button>`:''}`);
 }
+/** Append a suggested tag chip into the tags input. */
 function tipTagAdd(g){ const el=$('#tipG'); const cur=el.value.split(',').map(s=>s.trim()).filter(Boolean);
   if(!cur.includes(g))cur.push(g); el.value=cur.join(', '); }
 let TIPPHOTO=null;   // pending compressed photo for the open editor; ''=remove, null=unchanged
+/** Compress a chosen image on-device (≤900px JPEG ~100 KB) before storing. */
 function tipPhoto(inp){
   const f=inp.files[0]; if(!f) return;
   const img=new Image(); const rd=new FileReader();
@@ -1730,6 +2280,7 @@ function tipPhoto(inp){
     }; img.src=rd.result; };
   rd.readAsDataURL(f);
 }
+/** Validate + persist the tip (photo applied/removed via TIPPHOTO). */
 function tipSave(id){
   const title=$('#tipT').value.trim(); if(!title){toast('Give it a title');return;}
   const tags=$('#tipG').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
@@ -1740,26 +2291,48 @@ function tipSave(id){
   TIPPHOTO=null; closeSheet(); render();
 }
 
+
+/* ═══════════════ src/js/15-more.js ═══════════════ */
 /* ============================================================
-   MORE TAB — bag, courses, settings, export, golf-isms
+   MORE TAB — bag, courses, settings, golf-isms
+   ============================================================
+   MOREVIEW routes the sub-screens. The bag supports brand/
+   model and a bench (hidden from pickers, history retained).
+   Settings toggles map 1:1 to S.settings keys via setting().
    ============================================================ */
 let MOREVIEW='menu';
+/** Route the More sub-screens via MOREVIEW. */
 function vMore(){
   const views={menu:vMoreMenu,bag:vBag,courses:vCourses,settings:vSettings,data:vData,quips:vQuips};
   return (views[MOREVIEW]||vMoreMenu)();
 }
+/** Navigate within More. */
 function mgo(v){ MOREVIEW=v; render(); }
+/** The More menu list. */
 function vMoreMenu(){
-  const items=[['bag','🏌️','My bag','Clubs & stock yardages'],['courses','⛳','Courses','Saved courses & tees'],
-    ['settings','⚙︎','Settings','Numpads, labels, outdoor theme'],['data','💾','Backup & export','JSON, CSV, AI text'],
-    ['quips','😄','Golf-isms','Quips & stories']];
-  return `<div class="pageTitle"><h1>More</h1></div>
-  <div class="card"><div class="bd tight">${items.map(i=>`<div class="listRow" onclick="mgo('${i[0]}')">
-    <span style="font-size:22px">${i[1]}</span><div class="main"><div class="ti">${i[2]}</div><div class="sub">${i[3]}</div></div><span class="arr">›</span></div>`).join('')}</div></div>
-  <div class="small muted center">Caddie Book · 100% on-device · nothing leaves your phone</div>`;
+  // EXAMPLE: a whole screen assembled from ui.* components.
+  // Adding a menu entry = one row in this array.
+  const items=[
+    ['bag','🏌️','My bag','Clubs, brands & stock yardages'],
+    ['courses','⛳','Courses','Saved courses & tees'],
+    ['settings','⚙︎','Settings','Numpads, labels, outdoor theme'],
+    ['data','💾','Backup & export','JSON, CSV, AI text, 18Birdies import'],
+    ['quips','😄','Golf-isms','Quips & stories'],
+  ];
+  const rows = items.map(i=> ui.listRow(i[2], i[3], `mgo('${i[0]}')`,
+    {lead:`<span style="font-size:22px">${i[1]}</span>`})).join('');
+  return `<div class="pageTitle"><h1>More</h1></div>`
+    + ui.card('', rows, {tight:true})
+    + `<div class="small muted center">Caddie Book · 100% on-device · nothing leaves your phone</div>`;
 }
-function backBtn(){ return `<button class="btn sm ghost" onclick="mgo('menu')" style="margin-bottom:10px">‹ More</button>`; }
 
+/** Standard "‹ More" back button used by every sub-screen. */
+function backBtn(){
+  // EXAMPLE: built with the component library instead of raw HTML.
+  return ui.btn('‹ More', "mgo('menu')", {sm:true, kind:'ghost', style:'margin-bottom:10px'});
+}
+
+/** Bag editor: label/type/stock + brand/model, reorder, bench, delete. */
 function vBag(){
   const active=[...S.clubs].filter(c=>!c.bench).sort((a,b)=>a.sort-b.sort);
   const bench=[...S.clubs].filter(c=>c.bench).sort((a,b)=>a.sort-b.sort);
@@ -1787,10 +2360,13 @@ function vBag(){
     <div class="small muted" style="padding:8px 14px">Benched clubs keep their shot history in stats but never show in the picker.</div></div>`:''}
   <button class="btn wide" onclick="S.clubs.push({id:uid(),label:'New',type:'I',stock:150,sort:S.clubs.length,brand:'',model:'',bench:false});render()">＋ Add club</button>`;
 }
+/** Persist one club field as it is edited. */
 function cset(id,k,v){ const c=S.clubs.find(x=>x.id===id); c[k]= typeof v==='string'? v : v; if(v==='true')c[k]=true; if(v==='false')c[k]=false; save(); if(k==='bench')render(); }
+/** Swap a club up/down in picker order. */
 function bagMove(id,d){ const a=[...S.clubs].sort((x,y)=>x.sort-y.sort); const i=a.findIndex(x=>x.id===id); const j=i+d;
   if(j<0||j>=a.length)return; [a[i].sort,a[j].sort]=[a[j].sort,a[i].sort]; render(); }
 
+/** Saved-course list → tap opens the course page. */
 function vCourses(){
   return backBtn()+`<div class="pageTitle"><h1>Courses</h1></div>
   <button class="btn primary wide" onclick="courseEditor(null,false)">＋ New course</button><div style="height:12px"></div>
@@ -1801,6 +2377,8 @@ function vCourses(){
     ||'<div style="padding:14px" class="muted">No saved courses yet.</div>'}</div></div>`;
 }
 
+/** Every toggle maps 1:1 to an S.settings key; TrackMan column picker;
+ *  golfcourseapi key field. Add a setting = one setting() line + a default. */
 function vSettings(){
   const st=S.settings;
   const tmChecks=TM_METRICS.map(m=>`<button class="chip sm ${st.tmCols.includes(m[0])?'on':''}" onclick="tmToggle('${m[0]}')">${m[1]}</button>`).join('');
@@ -1822,14 +2400,17 @@ function vSettings(){
   </div></div>
   <div class="card"><div class="hd"><span class="t">TrackMan columns</span></div><div class="bd"><div class="chips">${tmChecks}</div></div></div>`;
 }
+/** One labeled ON/OFF row bound to an S.settings boolean. */
 function setting(t,sub,key){
   const on=S.settings[key];
   return `<div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)">
     <div class="grow"><div style="font-weight:700">${t}</div><div class="small muted">${sub}</div></div>
     <button class="chip ${on?'on':''}" style="min-width:64px" onclick="S.settings['${key}']=!S.settings['${key}'];render()">${on?'ON':'OFF'}</button></div>`;
 }
+/** Toggle a TrackMan column in/out of practice tables. */
 function tmToggle(k){ const a=S.settings.tmCols; const i=a.indexOf(k); if(i>=0)a.splice(i,1); else a.push(k); render(); }
 
+/** Golf-isms with attribution and context, edit/remove inline. */
 function vQuips(){
   return backBtn()+`<div class="pageTitle"><h1>Golf-isms</h1></div>
   <button class="btn wide" onclick="quipAdd()">＋ Add one</button><div style="height:14px"></div>
@@ -1838,7 +2419,9 @@ function vQuips(){
     ${q.context?`<span class="by" style="font-style:italic">${esc(q.context)}</span>`:''}
     <span class="by"><a href="#" onclick="quipEdit('${q.id}');return false" style="color:var(--turf)">edit</a> · <a href="#" onclick="S.quips=S.quips.filter(x=>x.id!=='${q.id}');render();return false" style="color:var(--ink2)">remove</a></span></blockquote>`).join('')}`;
 }
+/** New golf-ism (delegates to the editor sheet). */
 function quipAdd(){ quipEdit(null); }
+/** Editor sheet: the line, who said it, in reference to what. */
 function quipEdit(id){
   const q = id? S.quips.find(x=>x.id===id) : {text:'',by:'',context:''};
   openSheet(`<div class="sheetHd"><span class="t">${id?'Edit':'New'} golf-ism</span><button class="btn sm ghost" onclick="closeSheet()">Cancel</button></div>
@@ -1848,6 +2431,7 @@ function quipEdit(id){
     <div style="height:10px"></div>
     <button class="btn primary wide" onclick="quipSave('${id||''}')">Save</button>`);
 }
+/** Persist a golf-ism. */
 function quipSave(id){
   const t=$('#qT').value.trim(); if(!t){toast('Write the line first');return;}
   if(id){ const q=S.quips.find(x=>x.id===id); q.text=t; q.by=$('#qB').value.trim(); q.context=$('#qC').value.trim(); }
@@ -1855,8 +2439,16 @@ function quipSave(id){
   closeSheet(); render();
 }
 
+
+/* ═══════════════ src/js/16-data.js ═══════════════ */
 /* ============================================================
-   DATA: JSON backup/restore, CSV, AI text
+   DATA — backup, analysis exports, 18Birdies import
+   ============================================================
+   JSON     full state, restores with one tap (schema in 02-store)
+   CSV      one row per shot + a SUMMARY row per hole; legacy
+            imports emit summary-only rows
+   AI text  compact per-hole blocks with g/p/s digit suffixes
+   18B      merge-only, idempotent by source round id
    ============================================================ */
 function vData(){
   return backBtn()+`<div class="pageTitle"><h1>Backup & export</h1></div>
@@ -1879,15 +2471,18 @@ function vData(){
     <input type="file" id="imp18b" accept=".json,application/json,.txt" style="display:none" onchange="import18B(this)">
   </div></div>`;
 }
+/** Trigger a client-side file download via a Blob URL. */
 function download(name, text, mime){
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([text],{type:mime||'text/plain'}));
   a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
 }
+/** Full-state backup with schema/version envelope. */
 function exportJSON(){
   const payload={app:'caddiebook',schema:1,exported:new Date().toISOString(),data:S};
   download('caddiebook-backup-'+todayISO()+'.json', JSON.stringify(payload,null,1),'application/json');
 }
+/** Restore a backup: REPLACES state (18B import merges; this doesn\u2019t). */
 function importJSON(inp){
   const f=inp.files[0]; if(!f)return;
   const rd=new FileReader();
@@ -1897,7 +2492,9 @@ function importJSON(inp){
     }catch(e){ toast('That file did not parse as a Caddie Book backup.'); } };
   rd.readAsText(f);
 }
+/** RFC-4180 quoting for one CSV value. */
 function csvEsc(v){ v=v==null?'':String(v); return /[",\n]/.test(v)? '"'+v.replace(/"/g,'""')+'"':v; }
+/** Shots CSV: one row per shot + SUMMARY per hole; imports summary-only. */
 function exportCSV(){
   const head='date,course,hole,par,yardage,shot,club,lie,distance,unit,finish_type,finish,shape,effort,fraction,strike,note,score,putts,fir,gir,pen,sand,ud,three_putt';
   const rows=[head];
@@ -1923,6 +2520,7 @@ function exportCSV(){
   });
   download('caddiebook-shots-'+todayISO()+'.csv', rows.join('\n'),'text/csv');
 }
+/** One round in the compact AI format (fin-4g / fin-2p / shp-6s suffixes). */
 function roundText(r){
   const lines=[];
   const cn=courseOf(r)? courseOf(r).name:''; const t=teeOf(r);
@@ -1940,18 +2538,22 @@ function roundText(r){
   });
   return lines.join('\n');
 }
+/** Copy a single round\u2019s AI text. */
 function exportRoundText(id){
   const r=S.rounds.find(x=>x.id===id);
   copyText(roundText(r), 'Round copied — paste anywhere.');
 }
+/** Copy every shot-tracked round\u2019s AI text. */
 function exportAllText(){
   copyText(finishedRounds().filter(r=>!r.legacy).map(roundText).join('\n\n'), 'All shot-tracked rounds copied.');
 }
+/** Clipboard write with an execCommand fallback for older WebKit. */
 function copyText(txt,msg){
   const done=()=>toast(msg||'Copied.');
   if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done,()=>fallbackCopy(txt,done));
   else fallbackCopy(txt,done);
 }
+/** Hidden-textarea copy fallback. */
 function fallbackCopy(txt,done){
   const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
   ta.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta); done();
@@ -1970,6 +2572,8 @@ function import18B(inp){
     inp.value=''; };
   rd.readAsText(f);
 }
+/** Pure converter: 18Birdies export JSON → legacy rounds + stub courses.
+ *  Merge-only and idempotent (dedupes on the source round id). */
 function convert18B(json){
   const md = json.myData||json;
   const act = (md.activityData&&md.activityData.rounds)||[];
@@ -2016,12 +2620,22 @@ function convert18B(json){
   return {rounds:added, courses:newCourses, skipped};
 }
 
+
+/* ═══════════════ src/js/17-init.js ═══════════════ */
 /* ============================================================
-   SHEET + TOAST PLUMBING, INIT
+   PLUMBING + BOOT
+   ============================================================
+   The bottom sheet (#sheetWrap/#sheet), toast notifications,
+   fast-resume boot (reopen mid-round → straight back to the
+   hole), aggressive save-on-hide, and a console bridge that
+   exposes top-level state (S, HM, …) on window for debugging
+   from Safari's Web Inspector.
    ============================================================ */
 function openSheet(html){ $('#sheet').innerHTML=html; $('#sheetWrap').classList.add('open'); }
+/** Hide the sheet, drop any shot draft, save. */
 function closeSheet(){ $('#sheetWrap').classList.remove('open'); SH=null; save(); }
 let toastT=null;
+/** Transient pill notification above the tab bar. */
 function toast(msg){
   let el=$('#toast');
   if(!el){ el=document.createElement('div'); el.id='toast';
@@ -2031,6 +2645,7 @@ function toast(msg){
   clearTimeout(toastT); toastT=setTimeout(()=>el.style.display='none',2600);
 }
 document.addEventListener('DOMContentLoaded',()=>{
+  applyTheme();                                   // THEME overrides from theme.js
   $('#sheetWrap').addEventListener('click',e=>{ if(e.target.id==='sheetWrap') closeSheet(); });
   if(S.activeRoundId && activeRound()) { TAB='play'; PLAYVIEW='home'; }  // land on the round summary; Resume is one tap
   render();
@@ -2051,8 +2666,7 @@ try{
   });
 }catch(e){}
 
-function startDrill(name){ const p={id:uid(),date:todayISO(),location:'',focus:name,notes:'',blocks:[],putting:[]};
-  S.practice.push(p); PRACVIEW=p.id; render(); }
+
 </script>
 </body>
 </html>
