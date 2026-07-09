@@ -1,8 +1,17 @@
-# mmatasar.caddiebook.io
-
 # Caddie Book
 
 A single-file, offline-first golf scoring, data, and practice app. One HTML file, zero network dependencies, all data on-device.
+
+## The project (v3: modular source)
+
+The deployable app is still one file — `dist/caddiebook.html` — but the source is now a documented, modular project you can maintain yourself:
+
+```
+node build.js     # assembles src/ → dist/caddiebook.html
+node test.js && node test_import.js && node test_v3.js   # 48 tests
+```
+
+Start with `docs/ARCHITECTURE.md` (how it all fits) and `docs/CUSTOMIZING.md` (copy-paste recipes: change the theme, add a tab, add a stat card, add drills/settings, change a scoring rule). Design tokens live in `src/css/theme.css` and `src/js/theme.js`; reusable UI builders in `src/js/components.js`; every module and function is commented.
 
 ## Get it on your iPhone
 
@@ -70,6 +79,30 @@ The JSON backup maps directly:
 | `data.practice[].blocks[].shots[]` | practice_shot (carry, total, bs, cs, sm, la, spin, axis, apex, side, sideT, aa, path, face) |
 
 Numpad digits are stored raw (1 to 9) with `fType` naming the pad (`green`, `putt`, or shape on its own field), so a green-4 and a putt-4 are never confused. The CSV export suffixes them `4g`, `4p`, `4s` for the same reason.
+
+## What's new in v2
+
+- **iPhone-safe layout.** Top and bottom safe-area insets so nothing hides behind the Dynamic Island or home indicator, frosted tab bar, larger touch targets.
+- **Play hub.** The Play tab is now a round dashboard: resume card with live score, recent courses, and quick start. Full round history lives one tap away.
+- **Course pages.** City, state, and address per course with a Google Maps link for directions. Optional online lookup: paste a free golfcourseapi.com key into Settings and "Look up online" fills name, location, rating, slope, and all 18 holes.
+- **Two entry modes, switchable mid-round.** Shot-by-shot (the full notation system) or Quick score (Grint-style: score, putts, first-putt distance, fairway, approach-vs-pin pad, sand, penalties). Quick holes still feed FIR, GIR, first-putt stats, and the green heatmap.
+- **Front 9 / Back 9 rounds.** Real hole numbers (10 to 18 on the back), and all scoring stats normalize to per-18 so nines stop dragging your average under 70. Nines are excluded from the handicap since 9-hole differentials need ratings we don't store.
+- **Stats filters + insights.** Filter everything by time window or course. Hole history shows on each tee: times played, average, best.
+- **Practice drill library.** Ten seeded drills with instructions, grouped by category, each one tap from becoming a session.
+- **Tips**: link and photo attachments (photos compressed on-device to about 100 KB), plus the existing tags and search.
+- **Bag**: brand and model per club, and a bench section that hides clubs from pickers while keeping their history in stats.
+- **Round context**: playing partners, weather, and an on-course drinks counter.
+- **Golf-isms**: who said it and what it was in reference to.
+
+Tip photos live in browser storage alongside everything else (about 5 MB total budget), so keep taking JSON backups.
+
+## Importing from 18Birdies
+
+More → Backup & export → **Import 18Birdies JSON**. Request the export from 18Birdies (Settings → Account → Request My Data), then pick the file. What comes in: all played courses by name, plus every round as a summary round with hole-by-hole strokes, putts, FIR, GIR, and the birdie/par/bogey breakdown. Imported rounds show an 18B badge and feed scoring average, putts per round, FIR%, GIR%, and score distribution.
+
+What can't come in, because 18Birdies doesn't export it: per-shot data, hole pars, and course rating/slope. So imported rounds stay out of heatmaps, first-putt stats, stock yardages, and the handicap calc. Those stats build from rounds you track shot-by-shot in Caddie Book.
+
+Making it easier in the future: the import merges instead of replacing, and it remembers which 18Birdies round ids it has seen. Request a fresh export any time, import it, and only new rounds land. Duplicates are skipped automatically. Imported courses arrive without tee data; the first time you start a round on one, the course editor opens prefilled so you can add rating, slope, and yardages once.
 
 ## Exports
 
