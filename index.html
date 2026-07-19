@@ -20,29 +20,30 @@
    ============================================================ */
 :root{
   /* ---- surfaces ---- */
-  --paper:#F4F5F2;        /* app background */
-  --card:#FFFFFF;         /* card / sheet / input surfaces */
-  --line:#E3E5E1;         /* hairline borders and dividers */
+  --paper:#F6F2E6;        /* cream card-stock — the scorecard itself */
+  --card:#FFFDF7;         /* card / sheet / input surfaces */
+  --line:#E4DFD0;         /* hairline borders and dividers */
 
   /* ---- text ---- */
-  --ink:#171B1E;          /* primary text */
-  --ink2:#61686E;         /* secondary / muted text */
+  --ink:#1C1F1A;          /* pencil-ink primary text */
+  --ink2:#6B7066;         /* secondary / muted text */
 
   /* ---- brand ---- */
-  --turf:#1B6B41;         /* primary green: links, accents, selected pads */
-  --turf-deep:#0F4A2C;    /* darker green: primary buttons, hero card */
+  --turf:#17693E;         /* primary green: links, accents, selected pads */
+  --turf-deep:#0C3D24;    /* felt green: primary buttons, hero, tab bar */
   --turf-soft:#E4F1E9;    /* green tint: good-stat pills, lie badges */
-  --flag:#D93A2B;         /* THE accent: the "5 = pure" cell, alerts */
+  --flag:#CE2B21;         /* scorecard red: birdie circles, the pure cell */
   --flag-soft:#FCEAE7;    /* red tint: bad-stat pills, danger buttons */
   --sand:#F3ECD9;         /* warm tint: banners, warnings */
-  --amber:#A8770E;        /* warm text on sand */
+  --amber:#A07A22;        /* brass — trophies, hints, warm text */
   --sky:#EAF2F8;          /* cool tint: hole-history line */
 
   /* ---- shape & size ---- */
-  --r:16px;               /* large radius: cards, sheets, hero */
+  --r:18px;               /* large radius: cards, sheets, hero */
   --rs:11px;              /* small radius: inputs, banners */
   --tap:52px;             /* minimum touch target (buttons) */
-  --sh:0 1px 2px rgba(23,27,30,.06),0 4px 14px rgba(23,27,30,.06); /* card shadow */
+  --sh:0 1.5px 0 rgba(28,31,26,.10), 0 6px 18px rgba(28,31,26,.07); /* pressed-card shadow */
+  --stamp:3px 3px 0 rgba(28,31,26,.16); /* offset "rubber stamp" shadow for primary actions */
 
   /* ---- type ---- */
   /* System stacks only — no webfonts, so offline needs zero requests. */
@@ -84,13 +85,12 @@ a{color:var(--turf);font-weight:700;text-decoration:none}
 
 /* ---------- shell ---------- */
 #view{max-width:560px;margin:0 auto;padding:14px 14px 24px}
-#nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
-  border-top:1px solid var(--line);display:flex;z-index:40;padding-bottom:env(safe-area-inset-bottom)}
-#nav button{flex:1;background:none;border:0;padding:9px 0 7px;font-size:10.5px;font-weight:700;
-  letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
-#nav button .ic{display:block;font-size:21px;line-height:1.2;filter:grayscale(1);opacity:.55}
-#nav button.on{color:var(--turf-deep)}
+#nav{position:fixed;left:0;right:0;bottom:0;background:var(--turf-deep);
+  display:flex;z-index:40;padding:5px 6px;padding-bottom:calc(5px + env(safe-area-inset-bottom))}
+#nav button{flex:1;background:none;border:0;border-radius:13px;margin:0 2px;padding:8px 0 6px;font-size:10.5px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:rgba(255,253,247,.65)}
+#nav button .ic{display:block;font-size:21px;line-height:1.2;filter:grayscale(1) brightness(3);opacity:.7}
+#nav button.on{background:var(--card);color:var(--turf-deep)}
 #nav button.on .ic{filter:none;opacity:1}
 
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 12px;min-height:40px}
@@ -119,7 +119,8 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:11px 0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--tap);
   padding:0 18px;border:1.5px solid var(--ink);border-radius:14px;background:var(--card);
   font-size:16px;font-weight:700;cursor:pointer}
-.btn.primary{background:var(--turf-deep);border-color:var(--turf-deep);color:#fff;box-shadow:0 6px 16px rgba(15,74,44,.28)}
+.btn.primary{background:var(--turf-deep);border-color:var(--turf-deep);color:#fff;box-shadow:var(--stamp)}
+.btn.primary:active{transform:translate(2px,2px);box-shadow:1px 1px 0 rgba(28,31,26,.16)}
 .btn.danger{background:var(--flag-soft);border-color:transparent;color:var(--flag)}
 .btn.ghost{border-color:var(--line);color:var(--ink2);background:transparent}
 .btn.wide{width:100%}
@@ -176,8 +177,9 @@ textarea.f{min-height:80px}
 
 /* ---------- hole header ---------- */
 .holeHd{display:flex;align-items:stretch;gap:10px;margin-bottom:12px}
-.holeNo{border-radius:var(--r);background:var(--turf-deep);color:#fff;min-width:76px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px;box-shadow:var(--sh)}
+.holeNo{border-radius:14px;background:var(--card);color:var(--ink);min-width:76px;border:2.5px solid var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px;
+  transform:rotate(-2deg);box-shadow:var(--stamp)}
 .holeNo .h{font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;opacity:.7}
 .holeNo .n{font-family:var(--mono);font-weight:800;font-size:34px;line-height:1}
 .holeMeta{flex:1;border:1px solid var(--line);border-radius:var(--r);background:var(--card);
@@ -198,10 +200,11 @@ textarea.f{min-height:80px}
 .ovCell .hn{font-size:9px;font-weight:800;color:var(--ink2)}
 .ovCell .sc{font-family:var(--mono);font-weight:800;font-size:16px}
 .ovCell .dots{font-size:8px;letter-spacing:1px;min-height:10px}
-.ovCell.under{background:var(--turf-deep);border-color:var(--turf-deep);color:#fff}
-.ovCell.under .hn{color:#CFE6D8}
-.ovCell.over1{background:var(--sand);border-color:transparent}
-.ovCell.overX{background:var(--flag-soft);border-color:transparent}
+/* classic scorecard notation: circle a birdie, square a bogey, double-box worse */
+.ovCell.under{border:2px solid var(--flag);border-radius:50%;color:var(--flag)}
+.ovCell.under .sc{color:var(--flag)}
+.ovCell.over1{border:2px solid var(--ink);border-radius:4px}
+.ovCell.overX{border:2px solid var(--ink);border-radius:4px;box-shadow:inset 0 0 0 2px var(--card), inset 0 0 0 3.5px var(--ink)}
 
 /* ---------- sheet ---------- */
 #sheetWrap{position:fixed;inset:0;background:rgba(15,20,17,.5);z-index:60;display:none;align-items:flex-end;justify-content:center}
@@ -301,6 +304,22 @@ details.drill .db{padding:0 15px 13px;font-size:14.5px;line-height:1.5;white-spa
 .histLine{display:flex;gap:8px;align-items:center;background:var(--sky);border-radius:var(--rs);
   padding:9px 12px;font-size:13.5px;margin-bottom:10px}
 .histLine b{font-family:var(--mono)}
+
+
+/* ---------- strokes gained bars ---------- */
+.sgRow{display:flex;align-items:center;gap:10px;padding:6px 0}
+.sgLab{width:92px;font-size:13px;font-weight:800}
+.sgTrack{flex:1;position:relative;height:16px;background:var(--paper);border-radius:8px;overflow:hidden}
+.sgTrack i{position:absolute;left:50%;top:0;bottom:0;width:1.5px;background:var(--line)}
+.sgBar{position:absolute;top:2px;bottom:2px;border-radius:6px}
+.sgBar.pos{background:var(--turf)}
+.sgBar.neg{background:var(--flag)}
+.sgVal{width:52px;text-align:right;font-weight:800}
+.sgVal.good{color:var(--turf-deep)} .sgVal.bad{color:var(--flag)}
+
+/* pencil-dashed distance underline */
+.distShow{border-bottom:none;background-image:linear-gradient(90deg,var(--ink) 60%,transparent 0);
+  background-size:10px 3px;background-repeat:repeat-x;background-position:0 100%;padding-bottom:5px}
 </style>
 </head>
 <body>
@@ -512,14 +531,32 @@ function save(){ storeSet(JSON.stringify(S)); }
    or TrackMan metric is one row in the arrays below — pickers,
    exports and stats all read from here.
    ============================================================ */
-const LIES = [['T','Tee'],['FW','Fairway'],['RF','Rough'],['FR','Fringe'],['SD','Sand'],['GR','Green'],['RC','Recovery'],['HZ','Drop']];
-const LIE_NAME = Object.fromEntries(LIES);
+/* The lie picker (datadriven.golf-style). Each shot = distance-to-hole + lie;
+   the shot's RESULT is simply the next shot's position, so most swings need
+   no result entry at all. PN (Penalty) = playing after a drop for OB/water/
+   lost ball — it is a real position AND adds one penalty stroke. */
+const LIES = [
+  ['T','Tee'],['FW','Fairway'],['RF','Rough'],['DR','Deep rough'],
+  ['SD','Sand'],['RC','Recovery'],['GR','Green'],['PN','Penalty']
+];
+const LIE_NAME = Object.assign(Object.fromEntries(LIES),
+  {FR:'Fringe', HZ:'Drop'});   // legacy codes from pre-v4 rounds still display
 const LATS = ['LL','L','C','R','RR'];
 const LAT_NAME = {LL:'Far left',L:'Left',C:'On line',R:'Right',RR:'Far right'};
 
+/* GREEN PAD SEMANTICS (v5): the digit is relative to YOUR TARGET, not the
+   pin and not the green. Aim middle with a back pin, finish on the front
+   fringe = a "short" (2) that still may have hit the green. Whether the
+   GREEN was hit is never asked — the chain answers it (next lie = GR).
+   This separates dispersion (the pad) from outcome (GIR), which is the
+   only way both stay honest. */
+/* PUTT COMPASS (v6): the same 3×3, spoken in putter. Columns = start line
+   vs your aim line (pulled | on path | pushed). Rows = pace (long | good |
+   short). 5 = pure: on path with good pace — which is also what every
+   holed putt is. Center (5) = holed — the engine keys on pad===5. */
 const PAD_LABELS = {
-  green:{7:'Long-L',8:'Long',9:'Long-R',4:'Left',5:'PIN HIGH',6:'Right',1:'Short-L',2:'Short',3:'Short-R'},
-  putt: {7:'Long-L',8:'Long',9:'Long-R',4:'Left',5:'MADE',6:'Right',1:'Short-L',2:'Short',3:'Short-R'},
+  green:{7:'Long-L',8:'Long',9:'Long-R',4:'Left',5:'ON TARGET',6:'Right',1:'Short-L',2:'Short',3:'Short-R'},
+  putt: {7:'Pull-Long',8:'Long',9:'Push-Long',4:'Pulled',5:'MADE',6:'Pushed',1:'Pull-Short',2:'Short',3:'Push-Short'},
   shape:{7:'Pull-draw',8:'Draw',9:'Push-draw',4:'Pull',5:'STRAIGHT',6:'Push',1:'Pull-fade',2:'Fade',3:'Push-slice'}
 };
 const PAD_AXES = {
@@ -537,6 +574,16 @@ function padRows(kind){
 const STRIKES = [['t','Thin'],['h','Heavy'],['to','Toe'],['hl','Heel']];
 const WINDS = [['H','Into'],['D','Down'],['L2R','L→R'],['R2L','R→L']];
 const FRACS = ['½','¾'];
+/* Horizontal axis labels per pad; putting talks aim-line, not compass. */
+const PAD_HAXES = {
+  green:['◀ LEFT','RIGHT ▶'], putt:['◀ PULLED','PUSHED ▶'], shape:['◀ LEFT','RIGHT ▶']
+};
+/* Short-game styles: trajectory/technique vocabulary for shots inside
+   100 — nobody fades a chip the way they fade a 7-iron. */
+const SHORT_STYLES=[['low','Low / bump'],['std','Standard'],['high','High / flop'],['spin','Spinner']];
+/* Strategy tags (multi-select, any shot). The payoff stat is SG per tag:
+   do you actually score better playing the smart shot? */
+const SHOT_TAGS=[['smart','Smart play'],['risky','Risky'],['hero','Hero shot'],['layup','Layup'],['punch','Punch']];
 
 const TM_METRICS = [
   ['carry','Carry','yd'],['total','Total','yd'],['bs','Ball spd','mph'],['cs','Club spd','mph'],
@@ -561,6 +608,32 @@ function suggestClub(dist){
   for(const c of activeClubs()){ if(c.type==='P') continue;
     const d=Math.abs((c.stock||0)-dist); if(d<bd){bd=d;best=c;} }
   return best? best.id : null;
+}
+
+/* ---- putting vocabulary (v5): putts are not little approach shots ----
+   Intent: were you trying to make it or lag it close? (default guessed
+   from distance, one tap to flip). Line: did the ball start on your
+   intended line? Miss: green-reading language, not compass points —
+   short / long is pace, low / high side is the read. The LEAVE distance
+   needs no entry at all: it is simply the next putt's distance. */
+const PUTT_INTENTS=[['make','Trying to make'],['lag','Lagging close']];
+/* pace / line readers for the putt compass digits */
+const PUTT_LINE = d=> d==null?null : [1,4,7].includes(d)?'pulled' : [3,6,9].includes(d)?'pushed':'onpath';
+const PUTT_PACE = d=> d==null?null : d>=7?'long' : d<=3?'short':'good';
+
+/* ---- shot-type detail (v6): different swings produce different data ----
+   full  (>100y)      → ball-flight shape pad (draw/fade)
+   short (≤100y, off green) → trajectory, not curvature
+   putt  (GR)         → the putt compass above
+   Strategy tags apply to any shot; average SG per tag answers whether the
+   smart play or the hero shot actually scores better for THIS player. */
+const TRAJS=[['lo','Low runner'],['st','Standard'],['hi','High soft'],['fl','Flop'],['sp','Spinner']];
+const TAGS=[['smart','Smart play'],['layup','Layup'],['risky','Risky'],['hero','Hero shot'],['punch','Punch out']];
+/** Shot-kind for choosing which detail controls to show. */
+function shotKind(s){
+  if(s.lie==='GR') return 'putt';
+  const yds = s.unit==='f'? (s.dist||0)/3 : s.dist;
+  return (yds!=null && yds<=100)? 'short' : 'full';
 }
 
 /* ═══════════════ src/js/04-engine.js ═══════════════ */
@@ -593,6 +666,10 @@ function suggestClub(dist){
      SAND  save attempt = greenside sand (≤50y or no distance)
            on a missed GIR ; made = par or better
    ============================================================ */
+/** Was the ball holed on this shot? New data carries s.holed (set by the
+ *  In-the-hole button); pre-v6 shots signalled a make with pad===5, so
+ *  that remains the fallback when the flag is absent. */
+function isHoled(s){ return s.holed===true || (s.holed==null && s.pad===5); }
 /** The first shot taken from the green — its distance IS first-putt distance. */
 function firstPuttShot(h){
   return (h.shots||[]).find(s=>s.lie==='GR') || null;
@@ -600,7 +677,8 @@ function firstPuttShot(h){
 function deriveHole(h){
   const shots = h.shots||[];
   const ov = h.ov||{};
-  const pen = ov.pen!=null? ov.pen : (h.pen||0);
+  // penalties = manual count + one per PN (penalty-drop) position played
+  const pen = ov.pen!=null? ov.pen : (h.pen||0) + shots.filter(s=>s.lie==='PN').length;
   const score = ov.score!=null? ov.score : (shots.length? shots.length + pen : null);
   const putts = ov.putts!=null? ov.putts : shots.filter(s=>s.lie==='GR').length;
 
@@ -687,6 +765,35 @@ function deriveLegacyRound(r){
     firY:a.firY||0, firD:a.firD||0, girY:a.girY||0, girD:a.girD||0,
     tp:0, udA:0, udM:0, sA:0, sM:0,
     eagles:a.eagles||0, birdies:a.birdies||0, pars:a.pars||0, bogeys:a.bogeys||0, dblOrWorse:a.dblOrWorse||0};
+}
+
+/* ---------------- chain-derived carry ----------------
+   Because every shot stores DISTANCE TO HOLE, the distance a club
+   actually traveled falls out of consecutive positions:
+     carry ≈ dist_i − dist_{i+1}          (finished short of the hole)
+     carry ≈ dist_i + dist_{i+1}          (flew long — result pad 7/8/9)
+     carry ≈ dist_i                       (pin high offline — pad 4/6, or holed)
+   An explicit player estimate (s.est) always wins; a following PN
+   position means the outcome is unknown (OB/water) so no sample. */
+/** A shot's distance-to-hole in yards (putt feet ÷ 3). */
+function toYards(s){ return s.dist==null? null : (s.unit==='f'? s.dist/3 : s.dist); }
+/** Estimated distance shot i in hole h actually traveled (null = no sample). */
+function derivedCarry(h, i){
+  const s=(h.shots||[])[i]; if(!s || s.lie==='PN' || s.lie==='GR') return null;
+  if(s.est) return s.est;                       // player's own estimate wins
+  const d0=toYards(s); if(d0==null) return null;
+  const nx=h.shots[i+1];
+  if(!nx){                                      // final shot: counts only if holed
+    const d=deriveHole(h);
+    return d.score!=null && d.score===h.shots.length + (d.pen||0) && isHoled(s) ? d0 : null;
+  }
+  if(nx.lie==='PN') return null;                // ball is gone; carry unknowable
+  const d1=toYards(nx); if(d1==null) return null;
+  if(s.pad!=null){
+    if(s.pad>=7) return d0+d1;                  // long row: flew past the hole
+    if(s.pad===4||s.pad===6) return d0;         // pin high, offline
+  }
+  return Math.max(0, d0-d1);                    // default: finished short
 }
 
 /* ═══════════════ src/js/05-handicap.js ═══════════════ */
@@ -811,6 +918,162 @@ function courseOf(r){ return S.courses.find(c=>c.id===r.courseId); }
 /** The tee a round was played from. */
 function teeOf(r){ const c=courseOf(r); return c? (c.tees||[]).find(t=>t.id===r.teeId) : null; }
 
+
+/* ═══════════════ src/js/sg.js ═══════════════ */
+/* ============================================================
+   STROKES GAINED ENGINE
+   ============================================================
+   The question SG answers per shot: how many strokes did this
+   shot save or cost versus the expected result from that
+   position? Because every shot already stores DISTANCE TO HOLE
+   + LIE, the chain gives us SG for free:
+
+     SG(shot i) = E(pos i) − E(pos i+1) − strokes consumed
+
+   where E(lie, distance) is the expected strokes to hole out.
+   The whole round telescopes: total SG = Σ E(each hole's first
+   position) − actual score. That identity is tested.
+
+   BASELINE: scratch/tour-level expected-strokes tables adapted
+   from Mark Broadie's published research (Every Shot Counts).
+   Linear interpolation between anchors, clamped at the ends.
+   Deep rough = rough + 0.25 (documented approximation);
+   a Penalty position is valued as rough at its distance, and
+   the shot that sent the ball OB/water consumes 2 strokes
+   (swing + penalty) — Broadie's convention.
+
+   CATEGORIES (datadriven.golf's split):
+     ott       tee shot on par 4/5
+     approach  ≥100y toward the green, not on it
+     short     <100y, not on the green
+     putt      on the green
+
+   TARGET CALIBRATION: raw SG is vs scratch, so a 10-handicap
+   sees ≈ −10 per round — true but demoralizing. Like
+   datadriven.golf we also show SG vs YOUR TARGET: the target
+   handicap's strokes are distributed across categories in
+   proportion to each category's share of expected strokes in
+   your actual rounds. The category ranking (where the leak is)
+   is what drives practice; it is stable under this shift.
+   ============================================================ */
+
+/* anchor tables: [distance, expected strokes]; putt in feet, rest yards */
+const SG_BASE = {
+  putt:[[1,1.00],[2,1.01],[3,1.04],[4,1.13],[5,1.23],[6,1.34],[7,1.42],[8,1.50],[10,1.61],
+        [15,1.78],[20,1.87],[25,1.93],[30,1.98],[40,2.06],[50,2.14],[60,2.21],[90,2.40]],
+  T:  [[100,2.92],[120,2.99],[140,2.97],[160,2.99],[180,3.05],[200,3.12],[220,3.17],[240,3.25],
+       [260,3.45],[280,3.65],[300,3.71],[320,3.79],[340,3.86],[360,3.92],[380,3.96],[400,3.99],
+       [420,4.02],[440,4.08],[460,4.17],[480,4.28],[500,4.41],[540,4.65],[600,4.82]],
+  FW: [[10,2.18],[20,2.40],[40,2.60],[60,2.70],[80,2.75],[100,2.80],[120,2.85],[140,2.91],[160,2.98],
+       [180,3.08],[200,3.19],[220,3.32],[240,3.42],[260,3.53],[280,3.62],[300,3.71],[320,3.79],
+       [340,3.86],[380,3.96],[420,4.02],[460,4.17],[500,4.41],[600,4.82]],
+  RF: [[10,2.34],[20,2.59],[40,2.78],[60,2.91],[80,2.96],[100,3.02],[120,3.08],[140,3.15],[160,3.23],
+       [180,3.31],[200,3.42],[220,3.53],[240,3.64],[260,3.74],[280,3.83],[300,3.90],[340,4.06],
+       [380,4.22],[420,4.38],[500,4.70],[600,5.00]],
+  SD: [[10,2.43],[20,2.53],[40,2.82],[60,3.15],[80,3.24],[100,3.23],[120,3.21],[140,3.22],[160,3.28],
+       [180,3.40],[200,3.55],[220,3.70],[240,3.84],[280,4.00],[320,4.12],[400,4.40],[600,5.10]],
+  RC: [[10,2.90],[40,3.30],[80,3.60],[100,3.80],[140,4.00],[180,4.20],[220,4.40],[260,4.60],
+       [300,4.80],[400,5.10],[600,5.60]],
+};
+/** Expected strokes to hole out from (lie, distance). Distance in the
+ *  shot's own unit — feet on the green, yards elsewhere. */
+function expStrokes(lie, dist, unit){
+  if(dist==null) return null;
+  let key=lie, bump=0;
+  if(lie==='GR') key='putt';
+  else if(lie==='DR'){ key='RF'; bump=0.25; }      // deep rough approximation
+  else if(lie==='PN'){ key='RF'; }                 // drop position ≈ rough
+  else if(lie==='FR'||lie==='HZ') key='FW';        // legacy codes
+  const t=SG_BASE[key]||SG_BASE.FW;
+  const d = key==='putt' ? (unit==='f'? dist : dist*3) : (unit==='f'? dist/3 : dist);
+  if(d<=t[0][0]) return t[0][1]+bump;
+  for(let i=1;i<t.length;i++){
+    if(d<=t[i][0]){
+      const [d0,e0]=t[i-1], [d1,e1]=t[i];
+      return e0 + (e1-e0)*(d-d0)/(d1-d0) + bump;
+    }
+  }
+  return t[t.length-1][1]+bump;
+}
+/** SG category for a shot given its hole. */
+function sgCat(s, h, isFirst){
+  if(s.lie==='GR') return 'putt';
+  if(isFirst && s.lie==='T' && h.par>3) return 'ott';
+  const yds = s.unit==='f'? (s.dist||0)/3 : (s.dist||0);
+  return yds>=100? 'approach' : 'short';
+}
+/** Per-shot strokes gained for one (shot-tracked, completed) hole.
+ *  Returns [{shot, cat, sg, exp}] or null when distances are missing.
+ *  Convention: reaching a PN position costs the PREVIOUS shot 2 strokes
+ *  (swing + penalty); the PN row then plays on normally. */
+function sgHole(h){
+  const shots=h.shots||[];
+  if(!shots.length) return null;
+  const d=deriveHole(h);
+  if(d.score==null) return null;
+  const out=[];
+  for(let i=0;i<shots.length;i++){
+    const s=shots[i];
+    const e0=expStrokes(s.lie, s.dist, s.unit);
+    if(e0==null) return null;                        // incomplete data: skip hole
+    const nx=shots[i+1];
+    let e1=0, cost=1;
+    if(nx){
+      e1=expStrokes(nx.lie, nx.dist, nx.unit);
+      if(e1==null) return null;
+      if(nx.lie==='PN') cost=2;                      // this swing found trouble
+    } else {
+      // final position: only sound if the hole was actually holed out here
+      if(d.score !== shots.length + d.pen) return null;
+    }
+    out.push({shot:s, cat:sgCat(s,h,i===0), sg: e0-e1-cost, exp:e0});
+  }
+  return out;
+}
+/** Round-level SG: totals, per-category, and each category's share of
+ *  strokes played (used to distribute the target handicap's strokes in
+ *  calibration — transparent and documented, not a black box).
+ *  holesCounted lets the UI say "16 of 18 holes had full data". */
+function sgRound(r){
+  if(r.legacy) return null;
+  const cats={ott:0,approach:0,short:0,putt:0};
+  const strokes={ott:0,approach:0,short:0,putt:0};
+  let total=0, holesCounted=0, strokesTotal=0;
+  for(const h of r.holes){
+    const rows=sgHole(h);
+    if(!rows) continue;
+    holesCounted++;
+    for(let i=0;i<rows.length;i++){
+      const row=rows[i];
+      cats[row.cat]+=row.sg; total+=row.sg;
+      const cost = (h.shots[i+1]&&h.shots[i+1].lie==='PN')? 2:1;  // penalty charged here
+      strokes[row.cat]+=cost; strokesTotal+=cost;
+    }
+  }
+  if(!holesCounted) return null;
+  const share={};
+  for(const k in strokes) share[k]= strokesTotal? strokes[k]/strokesTotal : 0;
+  return {total, cats, share, holesCounted};
+}
+/** Aggregate SG across filtered rounds, per-18 normalized, with
+ *  target-handicap calibration applied per category. */
+function sgSummary(rounds, targetHcp){
+  const per=[]; let cats={ott:0,approach:0,short:0,putt:0}, share={ott:0,approach:0,short:0,putt:0};
+  let holes=0;
+  rounds.forEach(r=>{ const s=sgRound(r); if(!s) return;
+    per.push({r, s}); holes+=s.holesCounted;
+    for(const k in cats){ cats[k]+=s.cats[k]; share[k]+=s.share[k]*s.holesCounted; } });
+  if(!per.length) return null;
+  const per18=x=> x/holes*18;
+  const calCats={}, rawCats={};
+  for(const k in cats){
+    rawCats[k]=per18(cats[k]);
+    // hand the target handicap's strokes back, split by stroke share
+    calCats[k]=rawCats[k] + (targetHcp||0) * (share[k]/holes);
+  }
+  return {rounds:per, rawTotal:per18(Object.values(cats).reduce((a,b)=>a+b,0)),
+          rawCats, calCats, holes, target:targetHcp||0};
+}
 
 /* ═══════════════ src/js/theme.js ═══════════════ */
 /* ============================================================
@@ -1423,9 +1686,9 @@ function vShotsPanel(r,h,d){
       <span class="num" style="font-weight:800">${d.score!=null? d.score+' ('+(d.toPar===0?'E':(d.toPar>0?'+':'')+d.toPar)+')':''}</span></div>
     <div class="bd tight">${shotRows||'<div style="padding:14px" class="muted">No shots yet — tap Add shot.</div>'}${penRow}</div>
   </div>
-  <div class="grid2" style="margin-bottom:10px">
-    <button class="btn primary" style="min-height:62px;font-size:18px" onclick="newShot()">＋ Add shot</button>
-    <button class="btn danger" onclick="penaltyDrop()">Penalty + drop</button>
+  <div style="margin-bottom:10px">
+    <button class="btn primary wide" style="min-height:62px;font-size:18px" onclick="newShot()">＋ Add shot</button>
+    <div class="small muted center" style="margin-top:6px">Ball gone? Pick the <b>Penalty</b> lie on your next shot — the stroke adds itself.</div>
   </div>`;
 }
 /* quick-score entry: score, putts, first putt ft, FIR, approach pad, sand, pen */
@@ -1495,8 +1758,9 @@ function navHole(dir){
 }
 /** Adjust the hole\u2019s penalty count (tap the PEN row to remove). */
 function adjPen(d){ const h=curHole(); h.pen=Math.max(0,(h.pen||0)+d); render(); }
-/** One tap: +1 penalty and open the shot sheet prefilled with an HZ drop. */
-function penaltyDrop(){ const h=curHole(); h.pen=(h.pen||0)+1; render(); newShot('HZ'); }
+/** Legacy helper (pre-v4): +1 penalty and open a drop shot. The PN lie in
+ *  the sheet is now the normal path; kept for old muscle memory / tests. */
+function penaltyDrop(){ render(); newShot('PN'); }
 /** Tap a derived chip to override it (FIR/GIR cycle Y↔N, U&D toggles made). */
 function cycleOv(k){
   const h=curHole(); h.ov=h.ov||{};
@@ -1509,21 +1773,32 @@ function cycleOv(k){
 
 /* ═══════════════ src/js/10-shot-sheet.js ═══════════════ */
 /* ============================================================
-   SHOT SHEET — the tap-first entry surface (optimize this!)
+   SHOT SHEET — chain entry: DISTANCE TO HOLE + LIE, that's it
    ============================================================
-   Target: 4-6 taps per shot. Smart defaults do the work:
-   lie prefills from context (first shot T, after a green
-   attempt GR…), typing distance highlights the closest club,
-   and the finish control switches automatically — lateral
-   buttons for tee balls/layups, green pad for approaches,
-   putt pad (in feet) on a GR lie. Shape/effort/strike/note
-   stay collapsed and never block saving.
+   Modeled on datadriven.golf's insight: a shot's result IS the
+   next shot's position, so you never enter the same information
+   twice. The routine flow per shot:
+
+     1. Distance to hole  (prefilled on the tee — often 0 taps;
+                           flips to feet automatically on GR)
+     2. Lie               (prefilled from context — usually 0 taps)
+     3. Save · next shot  — or —  🕳 In the hole
+
+   Everything else — club (auto-suggested and auto-saved),
+   the result direction pad, carry estimate, shape, strike,
+   note — lives under one collapsed "Detail" section and never
+   blocks a save. A typical tee shot is TWO taps.
+
+   PN (Penalty) as a lie = "playing from a drop": it records the
+   position and adds the penalty stroke in one move.
+
    SH = the open draft {idx: shot index or null-for-new, s: shot,
-   more: detail section expanded, distStr: keypad buffer}.
+   more: detail expanded, distStr: keypad buffer}.
    ============================================================ */
-let SH=null; // draft {holeRef, idx|null, s:{...}, more:false}
-/** New shot with context-smart defaults: lie from the previous shot,
- *  club from estimated remaining distance, feet on the green. */
+let SH=null;
+
+/** New shot with context-smart defaults: lie + distance follow from the
+ *  previous position, club from the distance, feet on the green. */
 function blankShot(prefLie){
   const h=curHole();
   const prev=h.shots[h.shots.length-1];
@@ -1531,28 +1806,36 @@ function blankShot(prefLie){
   if(!prefLie){
     if(!h.shots.length) lie='T';
     else if(prev.lie==='GR' && prev.pad!==5) lie='GR';
-    else if(prev.fType==='green') lie='GR';
+    else if(prev.fType==='green' || (prev.pad!=null && prev.lie!=='GR')) lie='GR';
     else if(prev.fType==='lat') lie = prev.lat==='C'?'FW':'RF';
   }
   const remain = estRemaining(h);
   return {id:uid(), clubId: lie==='GR'? putterId(): suggestClub(remain), lie,
     dist: null, unit: lie==='GR'?'f':'y', fType:null, lat:null, pad:null,
+    est:null, intent:null, line:null, miss:null, style:null, tags:[],
     shape:null, effort:null, frac:null, strike:null, note:''};
 }
-/** Rough remaining-distance guess to preselect a club (no GPS needed). */
+/** Rough remaining-distance guess (also powers the club suggestion). */
 function estRemaining(h){
   if(!h.shots.length) return h.ydg||null;
   const last=h.shots[h.shots.length-1];
   if(last.unit==='y'&&last.dist&&last.clubId){ const c=club(last.clubId); if(c&&c.stock) return Math.max(0, last.dist - c.stock) || Math.round(last.dist*0.12); }
   return null;
 }
-/** Open the sheet for a fresh shot (optionally forcing a lie, e.g. HZ). */
-function newShot(prefLie){ SH={idx:null, s:blankShot(prefLie), more:false, distStr:''}; renderShotSheet(); }
-/** Open the sheet on an existing shot, detail section expanded. */
+/** Open the sheet for a fresh shot. The first shot of a hole arrives with
+ *  the card yardage already typed in — Save is the only required tap. */
+function newShot(prefLie){
+  const s=blankShot(prefLie);
+  const prefill = (!curHole().shots.length && s.lie==='T' && curHole().ydg)? String(curHole().ydg) : '';
+  if(prefill) s.dist=parseInt(prefill);
+  SH={idx:null, s, more:false, distStr:prefill};
+  renderShotSheet();
+}
+/** Open the sheet on an existing shot, detail expanded. */
 function editShot(i){ const h=curHole(); SH={idx:i, s:JSON.parse(JSON.stringify(h.shots[i])), more:true, distStr: h.shots[i].dist!=null? String(h.shots[i].dist):''}; renderShotSheet(); }
 
-/** Choose which finish control to show: putt on GR, lateral for driver/tee
- *  balls on par 4/5, green attempt for reachable approaches. */
+/** Which optional result control fits this shot: putt pad on the green,
+ *  lateral buttons for tee balls/layups, green pad for approaches. */
 function defaultFType(s){
   if(s.lie==='GR') return 'putt';
   const c=club(s.clubId);
@@ -1562,6 +1845,7 @@ function defaultFType(s){
   if(curHole().par===3 && s.lie==='T') return 'green';
   return c && (c.type==='Wg'||c.type==='I')? 'green':'lat';
 }
+
 /** Draw the whole entry sheet from the SH draft (called on every tap). */
 function renderShotSheet(){
   const s=SH.s;
@@ -1570,31 +1854,76 @@ function renderShotSheet(){
   if(!s.fType) s.fType=defaultFType(s);
   if(s.fType==='putt' && s.lie!=='GR') s.fType=defaultFType(s);
 
-  const lieChips = LIES.map(l=>`<button class="chip ${s.lie===l[0]?'on':''}" onclick="shSet('lie','${l[0]}')">${l[0]}<span class="small" style="margin-left:5px;font-weight:600;opacity:.75">${S.settings.showLabels? l[1]:''}</span></button>`).join('');
-  const sug = s.lie!=='GR'? suggestClub(parseInt(SH.distStr)||null): putterId();
-  const clubChips = S.clubs.map(c=>`<button class="chip ${s.clubId===c.id?'on':(c.id===sug?'hint':'')}" onclick="shSet('clubId','${c.id}')">${esc(c.label)}</button>`).join('');
+  /* — distance to hole: the hero — */
   const keyp = `
     <div class="row" style="align-items:flex-end;gap:14px;margin-bottom:8px">
       <div class="distShow">${SH.distStr||'<span class="muted">–</span>'}<span class="u"> ${s.unit==='f'?'ft':'yds'}</span></div>
-      <div class="small muted">${s.lie==='GR'? 'first-putt distance':'distance to target'}</div>
+      <div class="small muted">distance to the hole<br>from where the ball lies</div>
     </div>
     <div class="keypad">
       ${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="shKey('${n}')">${n}</button>`).join('')}
       <button onclick="shKey('C')" style="font-size:15px">CLR</button><button onclick="shKey('0')">0</button><button onclick="shKey('B')">⌫</button>
     </div>`;
+
+  /* — lie: a native dropdown (fast iOS wheel, prefilled) — */
+  const lieSel = `<select class="f" style="min-height:54px;font-size:18px;font-weight:700" onchange="shSet('lie',this.value)">
+    ${LIES.map(l=>`<option value="${l[0]}" ${s.lie===l[0]?'selected':''}>${l[1]}</option>`).join('')}</select>`;
+  const penNote = s.lie==='PN'? `<div class="small" style="color:var(--flag);font-weight:700;margin-top:6px">Playing from a drop — adds 1 penalty stroke automatically.</div>`:'';
+
+  /* — club: a dropdown like the lie, suggestion pre-selected — */
+  const sug = s.lie!=='GR'? suggestClub(parseInt(SH.distStr)||null): putterId();
+  const chosen = s.clubId || sug;
+  const clubSel = s.lie==='GR'
+    ? `<select class="f" style="min-height:54px;font-size:18px;font-weight:700" disabled><option>Putter</option></select>`
+    : `<select class="f" style="min-height:54px;font-size:18px;font-weight:700" onchange="shSet('clubId',this.value)">
+        ${activeClubs().filter(c=>c.type!=='P').map(c=>
+          `<option value="${c.id}" ${chosen===c.id?'selected':''}>${esc(c.label)}${c.stock?` · ${c.stock}y`:''}${c.id===sug?' ★':''}</option>`).join('')}</select>`;
+
+  /* — optional detail: result pad, carry estimate, shape, strike, note — */
+  const kind = shotKind(s);
+  let resultCtl='';
+  if(kind==='putt'){
+    // Putting speaks putting: intent + the pace×line compass.
+    // One tap on the pad records BOTH axes: vertical = pace
+    // (short / good / long), horizontal = line (pulled / on / pushed).
+    // The leave distance is never asked — it's the next putt's entry.
+    resultCtl = `
+      <div class="chips" style="margin-bottom:10px">${PUTT_INTENTS.map(p=>
+        `<button class="chip sm ${ (s.intent|| (s.dist!=null&&s.dist>20?'lag':'make'))===p[0]?'on':''}" onclick="shSet('intent','${p[0]}')">${p[1]}</button>`).join('')}</div>
+      ${padHTML('putt', s.pad, "shPad")}
+      <div class="small muted" style="margin-top:6px">One tap, two answers: up/down = <b>pace</b>, left/right = <b>start line vs your read</b>. Column 2-5-8 = started on line; row 4-5-6 = good pace. How far it finished isn't asked — your next putt's distance is the leave.</div>`;
+  } else if(kind==='short'){
+    // Inside 100: trajectory/style, not draw vs fade.
+    resultCtl = `
+      <div class="chips" style="margin-bottom:10px">${SHORT_STYLES.map(y=>
+        `<button class="chip sm ${s.style===y[0]?'on':''}" onclick="shSet('style','${y[0]}')">${y[1]}</button>`).join('')}</div>
+      ${padHTML('green', s.pad, "shPad")}
+      <div class="small muted" style="margin-top:6px">Style + finish vs <b>where you aimed</b>. Leave distance comes from your next shot.</div>`;
+  } else if(s.fType==='lat'){
+    resultCtl = `<div class="chips">${LATS.map(L=>`<button class="chip ${s.lat===L?'on':''}" style="min-width:56px" onclick="shSet('lat','${L}')">${L}</button>`).join('')}</div>
+      <div class="small muted" style="margin-top:6px">${s.lat? LAT_NAME[s.lat]:'Finish vs. intended line — optional, feeds the heatmaps'}</div>`;
+  } else {
+    resultCtl = padHTML('green', s.pad, "shPad")
+      + `<div class="small muted" style="margin-top:6px">Relative to <b>where you aimed</b>, not the pin or the green — back pin, aimed middle, finished front fringe is a "Short". Whether the green was hit comes from your next shot's lie.</div>`;
+  }
   const fSwitch = s.lie==='GR'? '' :
     `<div class="chips" style="margin-bottom:8px">
        <button class="chip sm ${s.fType==='green'?'on':''}" onclick="shSet('fType','green')">Green attempt</button>
        <button class="chip sm ${s.fType==='lat'?'on':''}" onclick="shSet('fType','lat')">Layup / tee ball</button></div>`;
-  let finish='';
-  if(s.fType==='lat'){
-    finish = `<div class="chips">${LATS.map(L=>`<button class="chip ${s.lat===L?'on':''}" style="min-width:56px" onclick="shSet('lat','${L}')">${L}</button>`).join('')}</div>
-      <div class="small muted" style="margin-top:6px">${s.lat? LAT_NAME[s.lat]:'Finish vs. intended line'}</div>`;
-  } else {
-    finish = padHTML(s.fType==='putt'?'putt':'green', s.pad, "shPad");
-  }
+  const secTitle = kind==='putt'? 'The putt (optional)' : kind==='short'? 'The shot — style & finish (optional)' : 'Result — where it ended up (optional)';
   const moreBody = `
-    <div class="sec">Shape</div>${padHTML('shape', s.shape, "shShape")}
+    <div class="sec">${secTitle}</div>
+    ${kind==='full'? `<div class="small muted" style="margin:-2px 0 8px">Usually skip this: your next shot's distance + lie already records the result. Tap it when you want dispersion on the heatmaps, or to sharpen the carry math (long misses add, pin-high counts flat).</div>`:''}
+    ${kind==='full'? fSwitch:''}${resultCtl}
+    ${s.lie!=='GR'? `<div class="sec">Carry estimate (optional)</div>
+    <div class="row"><input class="f num" style="width:110px" inputmode="numeric" placeholder="yds"
+      value="${s.est||''}" onchange="SH.s.est=parseInt(this.value)||null">
+      <span class="small muted grow">Know how far it went? This overrides the auto-derived distance in your club yardage stats.</span></div>`:''}
+    ${kind==='full'? `<div class="sec">Shape</div>`+padHTML('shape', s.shape, "shShape"):''}
+    <div class="sec">Strategy tags</div>
+    <div class="chips">${SHOT_TAGS.map(t=>
+      `<button class="chip sm ${(s.tags||[]).includes(t[0])?'on':''}" onclick="shSet('tag','${t[0]}')">${t[1]}</button>`).join('')}</div>
+    <div class="small muted" style="margin-top:4px">Tag the decision, learn the pattern: stats show strokes gained per tag — smart vs risky, hero vs layup.</div>
     <div class="sec">Effort</div>
     <div class="chips">
       ${FRACS.map(f=>`<button class="chip ${s.frac===f?'on':''}" onclick="shSet('frac','${f}')">${f}</button>`).join('')}
@@ -1605,33 +1934,36 @@ function renderShotSheet(){
     <div class="chips">${STRIKES.map(k=>`<button class="chip ${s.strike===k[0]?'on':''}" onclick="shSet('strike','${k[0]}')">${k[0]} <span class="small" style="opacity:.7;margin-left:4px">${k[1]}</span></button>`).join('')}</div>
     <div class="sec">Note</div>
     <input class="f" value="${esc(s.note)}" onchange="SH.s.note=this.value" placeholder="optional">`;
+
   openSheet(`
-    <div class="sheetHd"><span class="t">${SH.idx==null?'Shot '+(curHole().shots.length+1):'Edit shot '+(SH.idx+1)}</span>
+    <div class="sheetHd"><span class="t">${SH.idx==null?'Shot '+(curHole().shots.length+1):'Edit shot '+(SH.idx+1)} · Hole ${curHole().n}</span>
       <button class="btn sm ghost" onclick="closeSheet()">Cancel</button></div>
-    <div class="sec">Lie — hit from</div><div class="chips">${lieChips}</div>
     <div class="sec">Distance</div>${keyp}
-    ${s.lie==='GR'? `<div style="margin-top:8px"><button class="chip sm" onclick="tapIn()">⛳ Tap-in (2 ft, made)</button></div>`:''}
-    <div class="sec">Club</div><div class="chips">${clubChips}</div>
-    <div class="sec">Finish — where it ended up</div>${fSwitch}${finish}
-    <div style="height:10px"></div>
-    <button class="btn wide ghost" onclick="SH.more=!SH.more;renderShotSheet()">${SH.more?'▴ Hide detail':'▾ Shape · effort · strike · note'}</button>
-    ${SH.more? moreBody:''}
-    <div style="height:14px"></div>
+    <div class="sec">Lie</div>${lieSel}${penNote}
+    <div class="sec">Club</div>${clubSel}
+    <div style="height:12px"></div>
     <div class="grid2">
-      ${SH.idx!=null? `<button class="btn danger" onclick="delShot()">Delete</button>`:`<span></span>`}
+      <button class="btn" style="min-height:60px" onclick="holedOut()">🕳 In the hole</button>
       <button class="btn primary" style="min-height:60px;font-size:18px" onclick="saveShot()">Save shot</button>
     </div>
-    ${SH.idx!=null? `<div style="height:8px"></div><div class="grid2">
-      <button class="btn sm" onclick="moveShot(-1)">↑ Move up</button><button class="btn sm" onclick="moveShot(1)">↓ Move down</button>
+    ${s.lie==='GR'&&SH.idx==null? `<div style="margin-top:8px"><button class="chip sm" onclick="tapIn()">⛳ Tap-in (2 ft, made)</button></div>`:''}
+    <div style="height:10px"></div>
+    <button class="btn wide ghost" onclick="SH.more=!SH.more;renderShotSheet()">${SH.more?'▴ Hide detail':'▾ Result · shape · strike · note'}</button>
+    ${SH.more? moreBody:''}
+    ${SH.idx!=null? `<div style="height:12px"></div><div class="grid2">
+      <button class="btn danger" onclick="delShot()">Delete</button>
+      <div class="grid2"><button class="btn sm" onclick="moveShot(-1)">↑</button><button class="btn sm" onclick="moveShot(1)">↓</button></div>
     </div><div style="height:8px"></div><button class="btn sm wide ghost" onclick="insertBefore()">Insert a missed shot before this one</button>`:''}
   `);
 }
+
 /** Render any 3×3 numpad (green/putt/shape) with axis labels; `fn` is the
- *  global click handler name. Shared by entry AND settings preview. */
+ *  global click handler name. Shared by entry AND heatmaps. */
 function padHTML(kind, sel, fn){
   const rows=padRows(kind), lab=PAD_LABELS[kind], ax=PAD_AXES[kind];
   const topAx = (kind==='shape'&&!S.settings.shapeTopDraw)? ['FADE ↑','DRAW ↓'] : ax;
-  let b=`<div class="pad"><div class="axis"><span>◀ LEFT</span><span>${topAx[0]}</span><span>RIGHT ▶</span></div>`;
+  const hax=PAD_HAXES[kind]||PAD_HAXES.green;
+  let b=`<div class="pad"><div class="axis"><span>${hax[0]}</span><span>${topAx[0]}</span><span>${hax[1]}</span></div>`;
   for(const row of rows) for(const d of row){
     b+=`<button class="${d===5?'pure ':''}${sel===d?'on':''}" onclick="${fn}(${d})">
         <span class="d">${d}</span>${S.settings.showLabels?`<span class="l">${lab[d]}</span>`:''}</button>`;
@@ -1639,14 +1971,20 @@ function padHTML(kind, sel, fn){
   b+=`<div class="axis"><span></span><span>${topAx[1]}</span><span></span></div></div>`;
   return b;
 }
-/** Sheet field setter with the side-effect rules (lie change resets finish,
- *  GR forces putter + feet, fraction clears effort, etc.). */
+
+/** Sheet field setter with the side-effect rules (lie change resets the
+ *  result control, GR forces putter + feet, fraction clears effort…). */
 function shSet(k,v){
   if(k==='lie'){ SH.s.lie=v; SH.s.fType=null; SH.s.pad=null; SH.s.lat=null;
     if(v==='GR'){SH.s.unit='f'; SH.s.clubId=putterId();} else {SH.s.unit='y'; if(SH.s.clubId===putterId()) SH.s.clubId=null;} }
   else if(k==='fType'){ SH.s.fType=v; if(v==='lat')SH.s.pad=null; else SH.s.lat=null; }
   else if(k==='frac'){ SH.s.frac = SH.s.frac===v? null:v; if(SH.s.frac)SH.s.effort=null; }
   else if(k==='strike'){ SH.s.strike = SH.s.strike===v? null:v; }
+  else if(k==='intent'){ SH.s.intent = SH.s.intent===v? null:v; }
+  else if(k==='line'){ SH.s.line = SH.s.line===v? null:v; }
+  else if(k==='miss'){ SH.s.miss = SH.s.miss===v? null:v; }
+  else if(k==='style'){ SH.s.style = SH.s.style===v? null:v; }
+  else if(k==='tag'){ const a=SH.s.tags=SH.s.tags||[]; const i=a.indexOf(v); if(i>=0)a.splice(i,1); else a.push(v); }
   else { if(k==='clubId') SH.userPickedClub=true; SH.s[k]=v; }
   renderShotSheet();
 }
@@ -1659,16 +1997,30 @@ function shKey(k){
   if(SH.s.lie!=='GR' && !SH.userPickedClub){ const sg=suggestClub(SH.s.dist); if(sg) SH.s.clubId=sg; }
   renderShotSheet();
 }
-/** Finish pad tap (toggle). */
+/** Result pad tap (toggle). */
 function shPad(d){ SH.s.pad = SH.s.pad===d? null:d; renderShotSheet(); }
 /** Shape pad tap (toggle). */
 function shShape(d){ SH.s.shape = SH.s.shape===d? null:d; renderShotSheet(); }
+
 /** Commit the draft into the hole (append or replace) and close. */
 function saveShot(){
   const h=curHole(); const s=SH.s;
   s.dist = SH.distStr? parseInt(SH.distStr) : s.dist;
   if(SH.idx==null) h.shots.push(s); else h.shots[SH.idx]=s;
   closeSheet(); render();
+}
+/** This shot went in: save it marked holed (pad 5) and toast the hole's
+ *  score. Works for putts AND hole-outs from anywhere. */
+function holedOut(){
+  const h=curHole(); const s=SH.s;
+  s.dist = SH.distStr? parseInt(SH.distStr) : s.dist;
+  s.pad = 5;
+  if(!s.fType || s.fType==='lat') s.fType = s.lie==='GR'? 'putt':'green';
+  s.lat=null; s.miss=null;
+  if(SH.idx==null) h.shots.push(s); else h.shots[SH.idx]=s;
+  closeSheet(); render();
+  const d=deriveHole(h);
+  toast(`Hole ${h.n}: ${d.score} (${d.toPar===0?'E':(d.toPar>0?'+':'')+d.toPar})${d.toPar<0?' 🐦':''}`);
 }
 /** Delete the shot being edited. */
 function delShot(){ curHole().shots.splice(SH.idx,1); closeSheet(); render(); }
@@ -1678,7 +2030,6 @@ function moveShot(d){ const a=curHole().shots; const j=SH.idx+d; if(j<0||j>=a.le
 /** Insert a forgotten shot before the one being edited. */
 function insertBefore(){ const h=curHole(); const ins=blankShot(); h.shots.splice(SH.idx,0,ins);
   SH={idx:SH.idx, s:h.shots[SH.idx], more:false, distStr:''}; renderShotSheet(); }
-
 
 /* ═══════════════ src/js/11-round-views.js ═══════════════ */
 /* ============================================================
@@ -1894,6 +2245,8 @@ function vStats(){
       ${idx!=null && rs.length? courseHcpLine(idx):''}
     </div></div>
 
+  ${sgCard(rs)}
+
   <div class="card"><div class="hd"><span class="t">Scoring</span></div><div class="bd">
     <div class="grid4 center">
       ${bignum(r1(per18(rds.reduce((s,d)=>s+d.score,0))),'avg /18')}
@@ -1932,9 +2285,12 @@ function vStats(){
     </div><hr class="sep">
     <div class="small" style="font-weight:800;margin-bottom:4px">First-putt distance${nLegacy?' <span class="muted" style="font-weight:600">(shot-tracked rounds only)</span>':''}</div>
     <table class="data"><tr><th class="num">Dist</th><th class="num">n</th><th class="num">Make</th><th class="num">Avg putts</th><th class="num">3-putt</th></tr>${bRows}</table>
+    ${puttCraft(rs)}
   </div></div>
 
   ${hotClubsCard(rs)}
+  ${craftCard(rs)}
+
   ${heatmapCard()}
   ${stockYardCard()}
   ${wedgeMatrixCard()}`;
@@ -2037,18 +2393,25 @@ function bandOKputt(s){ if(!HM.band)return true; const [a,b]=HM.band.split('-').
 /** One-line interpretation hint per heatmap kind. */
 function heatRead(){
   return {green:'Hot bottom row (1·2·3) = chronic short miss — take more club. Hot right column = right-miss pattern.',
-    putt:'Hot 2 = dying it short-center (pace). Hot 6 = sliding by right (read or face). 5 is holed.',
+    putt:'Vertical = pace, horizontal = start line vs your read. Hot 2 = good line, dying short. Hot 6 = pushed past. 5 is holed.',
     shape:'A corner that stays lit names the fault: 7-corner = hook family, 3-corner = slice family.'}[HM.kind];
 }
 
 /* ---------------- stock yardages ---------------- */
 function clubShotDists(cid){
   const round=[], prac=[];
-  allShots().forEach(x=>{ const s=x.s;
-    if(s.clubId!==cid||s.unit!=='y'||s.dist==null)return;
-    if(!['T','FW','RF'].includes(s.lie))return;
-    if(s.strike||s.frac||(s.effort&&s.effort<95))return;      // mishits & partials don't pollute stock
-    round.push(s.dist); });
+  // Round samples are CHAIN-DERIVED carries: distance-to-hole now minus
+  // distance-to-hole next (direction-adjusted, see derivedCarry in the
+  // engine). A player-entered estimate (s.est) wins; mishits & partials
+  // are excluded so the stock number stays honest.
+  finishedRounds().forEach(r=>{ if(r.legacy) return;
+    r.holes.forEach(hh=> (hh.shots||[]).forEach((s,i)=>{
+      if(s.clubId!==cid || s.unit!=='y') return;
+      if(!['T','FW','RF','DR'].includes(s.lie)) return;
+      if(s.strike||s.frac||(s.effort&&s.effort<95)) return;
+      const c=derivedCarry(hh,i);
+      if(c!=null && c>=20) round.push(Math.round(c));
+    })); });
   S.practice.forEach(p=>(p.blocks||[]).forEach(b=>{ if(b.clubId!==cid||b.frac)return;
     (b.shots||[]).forEach(sh=>{ if(sh.carry) prac.push(Number(sh.carry)); }); }));
   return {round, prac, all:round.concat(prac)};
@@ -2089,6 +2452,134 @@ function wedgeMatrixCard(){
   return `<div class="card"><div class="hd"><span class="t">Wedge matrix</span></div><div class="bd tight">
     <table class="data"><tr><th>Wedge</th><th class="num">½</th><th class="num">¾</th><th class="num">Full</th></tr>${rows}</table>
     <div class="small muted" style="padding:8px 12px">Median carry by swing length, from rounds and practice. Tag ½ / ¾ at entry and this table builds itself.</div>
+  </div></div>`;
+}
+
+/* ============================================================
+   STROKES GAINED CARD + PUTTING CRAFT
+   ============================================================ */
+/** The four SG categories with display metadata. */
+const SG_CATS=[['ott','Off the tee','🚀'],['approach','Approach','🎯'],['short','Short game','⛳'],['putt','Putting','🥄']];
+/** The target handicap SG is calibrated against: setting → current index → 10. */
+function sgTargetHcp(){
+  if(S.settings.sgTarget!=null && S.settings.sgTarget!=='') return Number(S.settings.sgTarget);
+  const idx=currentIndex(); return idx!=null? Math.round(idx) : 10;
+}
+/** Strokes gained dashboard card: calibrated category bars, biggest-leak
+ *  callout, raw-vs-scratch total, per-round trend. */
+function sgCard(rs){
+  const target=sgTargetHcp();
+  const sum=sgSummary(rs.filter(r=>!r.legacy), target);
+  if(!sum) return `<div class="card"><div class="hd"><span class="t">Strokes gained</span></div><div class="bd">
+    <p class="small muted">Track a round shot-by-shot (distance + lie per shot) and SG appears here: which part of your game is leaking strokes versus a target ${target} handicap.</p></div></div>`;
+  const worst=SG_CATS.reduce((a,c)=> sum.calCats[c[0]]<sum.calCats[a[0]]? c:a, SG_CATS[0]);
+  const maxAbs=Math.max(0.6, ...SG_CATS.map(c=>Math.abs(sum.calCats[c[0]])));
+  const bars=SG_CATS.map(c=>{
+    const v=sum.calCats[c[0]], w=Math.min(100, Math.abs(v)/maxAbs*100);
+    return `<div class="sgRow"><span class="sgLab">${c[1]}</span>
+      <div class="sgTrack"><div class="sgBar ${v<0?'neg':'pos'}" style="width:${w/2}%;${v<0?'right:50%':'left:50%'}"></div><i></i></div>
+      <span class="num sgVal ${v<-0.05?'bad':v>0.05?'good':''}">${v>=0?'+':''}${r1(v)}</span></div>`;
+  }).join('');
+  const trend=sum.rounds.map(x=> x.s.total / x.s.holesCounted * 18);
+  return `<div class="card"><div class="hd"><span class="t">Strokes gained · per 18</span>
+      <span class="small muted num">${sum.holes} holes</span></div><div class="bd">
+    ${bars}
+    <hr class="sep">
+    <div class="banner" style="margin:0 0 10px">🎯 <span><b>${worst[1]}</b> is your leak — it costs the most strokes vs a ${target} handicap. That's where practice pays.</span></div>
+    ${trend.length>=2? spark(trend):''}
+    <div class="small muted" style="margin-top:6px">Bars = vs your target handicap (${target}), split by stroke share. Raw vs scratch: <b class="num">${sum.rawTotal>=0?'+':''}${r1(sum.rawTotal)}</b> per 18. Baseline: Broadie-style scratch tables. Change the target in Settings.</div>
+  </div></div>`;
+}
+/** Putting-craft stats from the new putt fields: start line, lag leaves,
+ *  read-based miss tendencies, intent split. Leave distance is the CHAIN:
+ *  the next putt's entered distance. */
+function puttCraft(rs){
+  const putts=[]; // {s, made, leaveFt, first}
+  rs.filter(r=>!r.legacy).forEach(r=> r.holes.forEach(h=>{
+    (h.shots||[]).forEach((s,i)=>{ if(s.lie!=='GR') return;
+      const nx=h.shots[i+1];
+      putts.push({s, made:s.pad===5, leaveFt: nx&&nx.lie==='GR'? nx.dist:null,
+                  first: !h.shots.slice(0,i).some(x=>x.lie==='GR')});
+    });}));
+  if(!putts.length) return '';
+  // the compass axes: column 2-5-8 = started on line; row 4-5-6 = good pace
+  const padded=putts.filter(p=>p.s.pad!=null);
+  const onLine=padded.filter(p=>[2,5,8].includes(p.s.pad)).length;
+  const goodPace=padded.filter(p=>[4,5,6].includes(p.s.pad)).length;
+  const missPads=padded.filter(p=>!p.made);
+  const cnt=(arr)=>missPads.filter(p=>arr.includes(p.s.pad)).length;
+  const pulled=cnt([1,4,7]), pushed=cnt([3,6,9]), short=cnt([1,2,3]), long=cnt([7,8,9]);
+  const lags=putts.filter(p=>p.first && p.s.dist>=21);
+  const leaves=lags.map(p=> p.made?0:p.leaveFt).filter(x=>x!=null);
+  const inside3=leaves.filter(x=>x<=3).length;
+  const makers=putts.filter(p=> (p.s.intent||'')==='make' || (!p.s.intent && p.s.dist<=20));
+  return `<hr class="sep"><div class="small" style="font-weight:800;margin-bottom:6px">Putting craft</div>
+    <div class="grid3 center">
+      ${bignum(padded.length? pct(onLine,padded.length):'–','started on line')}
+      ${bignum(padded.length? pct(goodPace,padded.length):'–','good pace')}
+      ${bignum(leaves.length? r1(mean(leaves))+"'":'–','avg leave 21ft+')}
+    </div>
+    ${missPads.length? `<div class="chips" style="margin-top:10px">
+      <span class="stat ${pulled>pushed?'bad':''}">Pulled <b>${pct(pulled,missPads.length)}</b></span>
+      <span class="stat ${pushed>pulled?'bad':''}">Pushed <b>${pct(pushed,missPads.length)}</b></span>
+      <span class="stat ${short>long?'bad':''}">Short <b>${pct(short,missPads.length)}</b></span>
+      <span class="stat ${long>short?'bad':''}">Long <b>${pct(long,missPads.length)}</b></span></div>
+      <div class="small muted" style="margin-top:4px">Of ${missPads.length} compass-tagged misses. Left/right = start line vs your read; short/long = pace.</div>`:''}
+    <div class="small muted" style="margin-top:6px">Make-intent putts: <b class="num">${pct(makers.filter(p=>p.made).length, makers.length)}</b> holed · lags inside 3ft: <b class="num">${leaves.length? pct(inside3,leaves.length):'–'}</b>. Leave = your next putt's distance — never entered twice.</div>`;
+}
+
+/* ============================================================
+   SHORT-GAME STYLES & STRATEGY TAGS
+   ============================================================
+   The question this card answers is Mike's: "do I score better
+   playing it safe or taking the shot on?" Metric = strokes
+   gained per shot, grouped by tag/style, with proximity (the
+   chain-derived leave) alongside for short-game styles.
+   ============================================================ */
+function craftCard(rs){
+  const styleRows={}, tagRows={};
+  SHORT_STYLES.forEach(y=>styleRows[y[0]]={n:0,sg:0,sgN:0,leaves:[]});
+  SHOT_TAGS.forEach(t=>tagRows[t[0]]={n:0,sg:0,sgN:0});
+  rs.filter(r=>!r.legacy).forEach(r=> r.holes.forEach(h=>{
+    const rows=sgHole(h);   // may be null when distances are missing
+    (h.shots||[]).forEach((s,i)=>{
+      const sg = rows? rows[i].sg : null;
+      if(s.style && styleRows[s.style]){
+        const y=styleRows[s.style]; y.n++;
+        if(sg!=null){ y.sg+=sg; y.sgN++; }
+        const nx=h.shots[i+1];
+        if(nx&&nx.lie==='GR'&&nx.dist!=null) y.leaves.push(nx.dist);
+        else if(s.pad===5 && !nx) y.leaves.push(0);
+      }
+      (s.tags||[]).forEach(t=>{ if(!tagRows[t]) return; const g=tagRows[t]; g.n++;
+        if(sg!=null){ g.sg+=sg; g.sgN++; } });
+    });
+  }));
+  const anyStyle=Object.values(styleRows).some(x=>x.n);
+  const anyTag=Object.values(tagRows).some(x=>x.n);
+  if(!anyStyle && !anyTag) return '';
+  const sRows=SHORT_STYLES.filter(y=>styleRows[y[0]].n).map(y=>{ const d=styleRows[y[0]];
+    return `<tr><td><b>${y[1]}</b></td><td class="num">${d.n}</td>
+      <td class="num">${d.leaves.length? r1(mean(d.leaves))+"'":'–'}</td>
+      <td class="num ${d.sgN&&d.sg/d.sgN<-0.03?'':''}">${d.sgN? (d.sg/d.sgN>=0?'+':'')+(Math.round(d.sg/d.sgN*100)/100).toFixed(2):'–'}</td></tr>`; }).join('');
+  const tRows=SHOT_TAGS.filter(t=>tagRows[t[0]].n).map(t=>{ const d=tagRows[t[0]];
+    return `<tr><td><b>${t[1]}</b></td><td class="num">${d.n}</td>
+      <td class="num">${d.sgN? (d.sg/d.sgN>=0?'+':'')+(Math.round(d.sg/d.sgN*100)/100).toFixed(2):'–'}</td></tr>`; }).join('');
+  // the verdict line: smart vs (risky ∪ hero)
+  const sm=tagRows.smart, rk={n:tagRows.risky.n+tagRows.hero.n, sg:tagRows.risky.sg+tagRows.hero.sg, sgN:tagRows.risky.sgN+tagRows.hero.sgN};
+  let verdict='';
+  if(sm.sgN>=5 && rk.sgN>=5){
+    const a=sm.sg/sm.sgN, b=rk.sg/rk.sgN;
+    verdict=`<div class="banner" style="margin:10px 0 0">${a>=b?'🧠':'🎲'} <span>${a>=b
+      ? `The data sides with the <b>smart play</b>: ${(a-b).toFixed(2)} strokes better per shot than risky/hero.`
+      : `Plot twist: your <b>risky/hero</b> shots are outscoring the smart play by ${(b-a).toFixed(2)} per shot. Sample: ${rk.sgN}.`}</span></div>`;
+  } else if(sm.n||rk.n){
+    verdict=`<div class="small muted" style="margin-top:8px">Verdict on smart-vs-risky arrives at 5+ SG-scored shots per side (${sm.sgN} vs ${rk.sgN} so far).</div>`;
+  }
+  return `<div class="card"><div class="hd"><span class="t">Styles & strategy</span></div><div class="bd tight">
+    ${anyStyle? `<table class="data"><tr><th>Short-game style</th><th class="num">n</th><th class="num">Avg leave</th><th class="num">SG/shot</th></tr>${sRows}</table>`:''}
+    ${anyTag? `<table class="data"><tr><th>Strategy tag</th><th class="num">n</th><th class="num">SG/shot</th></tr>${tRows}</table>`:''}
+    <div style="padding:${verdict?'0 12px 12px':'0'}">${verdict}</div>
   </div></div>`;
 }
 
@@ -2397,6 +2888,12 @@ function vSettings(){
     <label class="f">golfcourseapi.com key (optional)</label>
     <input class="f" value="${esc(S.settings.gcApiKey||'')}" placeholder="Paste API key for online course lookup" onchange="S.settings.gcApiKey=this.value.trim();save();render()">
     <div class="small muted" style="margin-top:6px">Free key at golfcourseapi.com — fills rating, slope, address and all 18 holes when you add a course. Everything still works offline without it.</div>
+  </div></div>
+  <div class="card"><div class="hd"><span class="t">Strokes gained</span></div><div class="bd">
+    <label class="f">Target handicap (calibration)</label>
+    <input class="f num" inputmode="numeric" style="width:120px" value="${S.settings.sgTarget!=null?S.settings.sgTarget:''}"
+      placeholder="auto" onchange="S.settings.sgTarget=this.value===''?null:parseInt(this.value);save()">
+    <div class="small muted" style="margin-top:6px">SG bars compare you to this handicap (blank = your current index, or 10). Raw vs-scratch is always shown too.</div>
   </div></div>
   <div class="card"><div class="hd"><span class="t">TrackMan columns</span></div><div class="bd"><div class="chips">${tmChecks}</div></div></div>`;
 }
